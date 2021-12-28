@@ -11,32 +11,31 @@
 </head>
 <body class="h-full">
     <%= @inner_content %>
-    <footer>
+    <footer class="text-sm text-gray-500 hover:text-gray-900">
         <div class="max-w-7xl mx-auto py-12 px-4 overflow-hidden sm:px-6 lg:px-8">
             <nav class="-mx-5 -my-2 flex flex-wrap justify-center" aria-label="Footer">
-            <div class="px-5 py-2">
-                <a href="#" class="text-base text-gray-500 hover:text-gray-900">
-                Imprint
-                </a>
-            </div>
+                <div class="px-5 py-2">
+                    &copy; <%= DateTime.utc_now.year %> Circularly All rights reserved.
+                </div>
+                <div class="px-1 py-2">
+                    <a href="#">
+                    Imprint
+                    </a>
+                </div>
 
-            <div class="px-5 py-2">
-                <a href="#" class="text-base text-gray-500 hover:text-gray-900">
-                Terms
-                </a>
-            </div>
+                <div class="px-1 py-2">
+                    <a href="#">
+                    Terms
+                    </a>
+                </div>
 
-            <div class="px-5 py-2">
-                <a href="#" class="text-base text-gray-500 hover:text-gray-900">
-                Privacy
-                </a>
-            </div>
+                <div class="px-1 py-2">
+                    <a href="#">
+                    Privacy
+                    </a>
+                </div>
 
             </nav>
-            
-            <p class="mt-8 text-center text-base text-gray-400">
-            &copy; <%= DateTime.utc_now.year %> Circularly All rights reserved.
-            </p>
         </div>
     </footer>
 </body>
