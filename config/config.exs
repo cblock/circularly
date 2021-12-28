@@ -11,6 +11,8 @@ config :circularly,
   ecto_repos: [Circularly.Repo],
   generators: [binary_id: true]
 
+config :circularly, Circularly.Repo, migration_timestamps: [type: :utc_datetime]
+
 # Configures the endpoint
 config :circularly, CircularlyWeb.Endpoint,
   url: [host: "localhost"],
