@@ -22,13 +22,15 @@ import "../css/app.css"
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html"
 // Establish Phoenix Socket and LiveView configuration.
-import {Socket} from "phoenix"
-import {LiveSocket} from "phoenix_live_view"
+import { Socket } from "phoenix"
+import { LiveSocket } from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import Alpine from "alpinejs";
+import timeout from '@victoryoalli/alpinejs-timeout'
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 
+Alpine.plugin(timeout)
 window.Alpine = Alpine;
 Alpine.start();
 
@@ -38,11 +40,11 @@ let liveSocket = new LiveSocket("/live", Socket, {
             if (from._x_dataStack) { window.Alpine.clone(from, to) }
         }
     },
-    params: {_csrf_token: csrfToken}
+    params: { _csrf_token: csrfToken }
 })
 
 // Show progress bar on live navigation and form submits
-topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
+topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" })
 window.addEventListener("phx:page-loading-start", info => topbar.show())
 window.addEventListener("phx:page-loading-stop", info => topbar.hide())
 

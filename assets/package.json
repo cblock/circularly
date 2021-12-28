@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@victoryoalli/alpinejs-timeout": "^1.0.0",
     "alpinejs": "^3.7.1"
   }
 }
