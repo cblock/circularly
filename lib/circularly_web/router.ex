@@ -17,6 +17,10 @@ defmodule CircularlyWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :auth_layout do
+    plug :put_root_layout, {CircularlyWeb.LayoutView, :auth_root}
+  end
+
   scope "/", CircularlyWeb do
     pipe_through :browser
 
@@ -60,7 +64,7 @@ defmodule CircularlyWeb.Router do
   ## Authentication routes
 
   scope "/", CircularlyWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated]
+    pipe_through [:browser, :redirect_if_user_is_authenticated, :auth_layout]
 
     get "/users/register", UserRegistrationController, :new
     post "/users/register", UserRegistrationController, :create
@@ -81,7 +85,7 @@ defmodule CircularlyWeb.Router do
   end
 
   scope "/", CircularlyWeb do
-    pipe_through [:browser]
+    pipe_through [:browser, :auth_layout]
 
     delete "/users/log_out", UserSessionController, :delete
     get "/users/confirm", UserConfirmationController, :new

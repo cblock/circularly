@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%= csrf_meta_tag() %>
+    <%= live_title_tag assigns[:page_title] || "Circularly", suffix: " · Phoenix Framework" %>
+    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
+    <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
+</head>
+<body class="h-full">
+    <%= @inner_content %>
+    <footer class="bg-white">
+        <div class="max-w-7xl mx-auto py-12 px-4 overflow-hidden sm:px-6 lg:px-8">
+            <nav class="-mx-5 -my-2 flex flex-wrap justify-center" aria-label="Footer">
+            <div class="px-5 py-2">
+                <a href="#" class="text-base text-gray-500 hover:text-gray-900">
+                Imprint
+                </a>
+            </div>
+
+            <div class="px-5 py-2">
+                <a href="#" class="text-base text-gray-500 hover:text-gray-900">
+                Terms
+                </a>
+            </div>
+
+            <div class="px-5 py-2">
+                <a href="#" class="text-base text-gray-500 hover:text-gray-900">
+                Privacy
+                </a>
+            </div>
+
+            </nav>
+            
+            <p class="mt-8 text-center text-base text-gray-400">
+            &copy; <%= DateTime.utc_now.year %> Circularly All rights reserved.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
