@@ -19,6 +19,9 @@
   <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
     <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
       <.form let={f} for={@changeset} action={Routes.user_registration_path(@conn, :create)}, class="space-y-6">
+        <%=  if @changeset.action do %>
+        <%= render CircularlyWeb.LayoutView, "_form_notifications.html", message: "Oops, something went wrong! Please check the errors below." %>
+        <% end %>
         <div>
           <%= label f, :email, class: "block text-sm font-medium text-gray-700" %>
           <div class="mt-1">
@@ -86,7 +89,3 @@
     </div>
   </div>
 </div>
-
-<%= if @changeset.action do %>
-<%= render CircularlyWeb.LayoutView, "_form_notifications.html", message: "Oops, something went wrong! Please check the errors below." %>
-<% end %>
