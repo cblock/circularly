@@ -1,5 +1,7 @@
 # Circularly
 
+[![Crowdin](https://badges.crowdin.net/circularly/localized.svg)](https://crowdin.com)
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
