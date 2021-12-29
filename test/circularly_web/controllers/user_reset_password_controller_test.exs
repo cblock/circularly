@@ -13,7 +13,7 @@ defmodule CircularlyWeb.UserResetPasswordControllerTest do
     test "renders the reset password page", %{conn: conn} do
       conn = get(conn, Routes.user_reset_password_path(conn, :new))
       response = html_response(conn, 200)
-      assert response =~ "<h1>Forgot your password?</h1>"
+      assert response =~ "Forgot your password?"
     end
   end
 
@@ -54,7 +54,7 @@ defmodule CircularlyWeb.UserResetPasswordControllerTest do
 
     test "renders reset password", %{conn: conn, token: token} do
       conn = get(conn, Routes.user_reset_password_path(conn, :edit, token))
-      assert html_response(conn, 200) =~ "<h1>Reset password</h1>"
+      assert html_response(conn, 200) =~ "Reset password"
     end
 
     test "does not render reset password with invalid token", %{conn: conn} do
@@ -78,15 +78,15 @@ defmodule CircularlyWeb.UserResetPasswordControllerTest do
       conn =
         put(conn, Routes.user_reset_password_path(conn, :update, token), %{
           "user" => %{
-            "password" => "new valid password",
-            "password_confirmation" => "new valid password"
+            "password" => "New valid password!",
+            "password_confirmation" => "New valid password!"
           }
         })
 
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
       refute get_session(conn, :user_token)
       assert get_flash(conn, :info) =~ "Password reset successfully"
-      assert Accounts.get_user_by_email_and_password(user.email, "new valid password")
+      assert Accounts.get_user_by_email_and_password(user.email, "New valid password!")
     end
 
     test "does not reset password on invalid data", %{conn: conn, token: token} do
@@ -99,8 +99,9 @@ defmodule CircularlyWeb.UserResetPasswordControllerTest do
         })
 
       response = html_response(conn, 200)
-      assert response =~ "<h1>Reset password</h1>"
-      assert response =~ "should be at least 12 character(s)"
+      assert response =~ "Reset password"
+      assert response =~ "at least one digit or punctuation character"
+      assert response =~ "at least one upper case character"
       assert response =~ "does not match password"
     end
 
