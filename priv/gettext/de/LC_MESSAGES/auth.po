@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: circularly\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: German\n"
-"PO-Revision-Date: 2021-12-29 21:01\n"
+"PO-Revision-Date: 2021-12-29 22:51\n"
 
 #: lib/circularly_web/templates/user_confirmation/edit.html.heex:8
 #: lib/circularly_web/templates/user_confirmation/edit.html.heex:17
@@ -82,7 +82,7 @@ msgstr "Passwort erfolgreich zurückgesetzt."
 #: lib/circularly_web/templates/user_registration/new.html.heex:43
 #, elixir-format, ex-autogen
 msgid "Register"
-msgstr "Anmelden"
+msgstr "Konto anlegen"
 
 #: lib/circularly_web/templates/user_registration/new.html.heex:11
 #, elixir-format, ex-autogen
@@ -119,7 +119,7 @@ msgstr "Anmelden"
 #: lib/circularly_web/templates/user_session/new.html.heex:8
 #, elixir-format, ex-autogen
 msgid "Sign in to your account"
-msgstr "Melden Sie sich in Ihrem Konto an"
+msgstr "Im Konto anmelden"
 
 #: lib/circularly_web/templates/user_session/new.html.heex:71
 #, elixir-format, ex-autogen
@@ -129,7 +129,7 @@ msgstr "Mit Facebook anmelden"
 #: lib/circularly_web/templates/user_session/new.html.heex:89
 #, elixir-format, ex-autogen
 msgid "Sign in with GitHub"
-msgstr "Mit GitHub anmelnden"
+msgstr "Mit GitHub anmelden"
 
 #: lib/circularly_web/templates/user_session/new.html.heex:80
 #, elixir-format, ex-autogen
@@ -154,7 +154,7 @@ msgstr "Mit Twitter registrieren"
 #: lib/circularly_web/controllers/user_confirmation_controller.ex:56
 #, elixir-format, ex-autogen
 msgid "User confirmation link is invalid or it has expired."
-msgstr "Der Link zum Zurücksetzen Ihres Passworts ist entweder ungültig oder abgelaufen."
+msgstr "Der Link zum Zurücksetzen des Passworts ist entweder ungültig oder abgelaufen."
 
 #: lib/circularly_web/controllers/user_confirmation_controller.ex:40
 #, elixir-format, ex-autogen
@@ -172,7 +172,7 @@ msgstr "Benutzer erfolgreich angelegt."
 #: lib/circularly_web/templates/user_reset_password/new.html.heex:12
 #, elixir-format, ex-autogen
 msgid "sign in to your account"
-msgstr "melden Sie sich in Ihrem Konto an"
+msgstr "im Konto anmelden"
 
 #: lib/circularly_web/templates/user_session/new.html.heex:12
 #, elixir-format, ex-autogen
