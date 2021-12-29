@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: circularly\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: German\n"
-"PO-Revision-Date: 2021-12-29 20:44\n"
+"PO-Revision-Date: 2021-12-29 21:02\n"
 
 msgid "can't be blank"
 msgstr "darf nicht leer sein"
@@ -37,59 +37,59 @@ msgid "does not match confirmation"
 msgstr "stimmt nicht überein"
 
 msgid "is still associated with this entry"
-msgstr ""
+msgstr "ist noch mit diesem Eintrag verknüpft"
 
 msgid "are still associated with this entry"
-msgstr ""
+msgstr "sind noch mit diesem Eintrag verknüpft"
 
 msgid "should be %{count} character(s)"
 msgid_plural "should be %{count} character(s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "sollte genau ein Zeichen lang sein"
+msgstr[1] "sollte genau %{count} Zeichen lang sein"
 
 msgid "should have %{count} item(s)"
 msgid_plural "should have %{count} item(s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "sollte ein Element enthalten"
+msgstr[1] "sollte %{count} Elemente enthalten"
 
 msgid "should be at least %{count} character(s)"
 msgid_plural "should be at least %{count} character(s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "sollte mindestens ein Zeichen enthalten"
+msgstr[1] "sollte mindestens %{count} Zeichen enthalten"
 
 msgid "should have at least %{count} item(s)"
 msgid_plural "should have at least %{count} item(s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "sollte mindestens ein Element enthalten"
+msgstr[1] "sollte mindestens %{count} Elemente enthalten"
 
 msgid "should be at most %{count} character(s)"
 msgid_plural "should be at most %{count} character(s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "darf höchstens ein Zeichen enthalten"
+msgstr[1] "darf höchstens %{count} Zeichen enthalten"
 
 msgid "should have at most %{count} item(s)"
 msgid_plural "should have at most %{count} item(s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "darf höchstens ein Element enthalten"
+msgstr[1] "darf höchstens %{count} Elemente enthalten"
 
 msgid "must be less than %{number}"
-msgstr ""
+msgstr "muss kleiner sein als %{number}"
 
 msgid "must be greater than %{number}"
-msgstr ""
+msgstr "muss größer sein als %{number}"
 
 msgid "must be less than or equal to %{number}"
-msgstr ""
+msgstr "muss kleiner oder gleich %{number} sein"
 
 msgid "must be greater than or equal to %{number}"
-msgstr ""
+msgstr "muss größer oder gleich %{number} sein"
 
 msgid "must be equal to %{number}"
-msgstr ""
+msgstr "muss genau %{number} sein"
 
 #: lib/circularly_web/templates/user_registration/new.html.heex:23
 #: lib/circularly_web/templates/user_reset_password/edit.html.heex:20
 #, elixir-format, ex-autogen
 msgid "Oops, something went wrong! Please check the errors below."
-msgstr ""
+msgstr "Hoppla, etwas ist schief gelaufen! Bitte überprüfen Sie die Fehler im Formular."
 
