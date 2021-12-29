@@ -10,12 +10,12 @@ msgstr ""
 "Project-Id-Version: circularly\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: German\n"
-"PO-Revision-Date: 2021-12-29 20:44\n"
+"PO-Revision-Date: 2021-12-29 21:02\n"
 
 #: lib/circularly_web/templates/page/index.html.heex:2
 #, elixir-format, ex-autogen
 msgid "Welcome to %{name}!"
-msgstr ""
+msgstr "Herzlich Willkommen bei %{name}!"
 
 #: lib/circularly_web/templates/user_confirmation/new.html.heex:11
 #: lib/circularly_web/templates/user_registration/new.html.heex:14
@@ -23,5 +23,5 @@ msgstr ""
 #: lib/circularly_web/templates/user_session/new.html.heex:11
 #, elixir-format, ex-autogen
 msgid "Or"
-msgstr ""
+msgstr "Oder"
 
