@@ -23,7 +23,7 @@
         <%= render CircularlyWeb.LayoutView, "_form_notifications.html", message: dgettext("errors", "Oops, something went wrong! Please check the errors below.") %>
         <% end %>
         <div>
-          <%= label f, dgettext("auth", "Email"), class: "block text-sm font-medium text-gray-700" %>
+          <%= label f, :email, dgettext("auth", "Email"), class: "block text-sm font-medium text-gray-700" %>
           <div class="mt-1">
             <%= email_input f, :email, required: true, class: "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm" %>
             <%= error_tag f, :email %>
@@ -31,7 +31,7 @@
         </div>
 
         <div>
-          <%= label f, dgettext("auth", "Password"), class: "block text-sm font-medium text-gray-700" %>
+          <%= label f, :password, dgettext("auth", "Password"), class: "block text-sm font-medium text-gray-700" %>
           <div class="mt-1">
             <%= password_input f, :password, required: true, class: "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm" %>
             <%= error_tag f, :password %>

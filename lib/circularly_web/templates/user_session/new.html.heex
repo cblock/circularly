@@ -20,7 +20,7 @@
           <%= render CircularlyWeb.LayoutView, "_form_notifications.html", message: @error_message %>
         <% end %>
         <div>
-          <%= label f, dgettext("auth", "Email"), class: "block text-sm font-medium text-gray-700" %>
+          <%= label f, :email, dgettext("auth", "Email"), class: "block text-sm font-medium text-gray-700" %>
           <div class="mt-1">
             <%= email_input f, :email, required: true, class: "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm" %>
             <%= error_tag f, :email %>
@@ -28,7 +28,7 @@
         </div>
 
         <div>
-          <%= label f, dgettext("auth", "Password"), class: "block text-sm font-medium text-gray-700" %>
+          <%= label f, :password, dgettext("auth", "Password"), class: "block text-sm font-medium text-gray-700" %>
           <div class="mt-1">
             <%= password_input f, :password, required: true, class: "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm" %>
             <%= error_tag f, :password %>
@@ -37,8 +37,8 @@
 
         <div class="flex items-center justify-between">
           <div class="flex items-center">
-            <%= checkbox f, dgettext("auth", "Remember me"), class: "h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded" %>
-            <%= label f, :remember_me, "Remember me", class: "ml-2 block text-sm text-gray-900" %>
+            <%= checkbox f, :remember_me, class: "h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded" %>
+            <%= label f, :remember_me, dgettext("auth", "Remember me"), class: "ml-2 block text-sm text-gray-900" %>
           </div>
 
           <div class="text-sm">
