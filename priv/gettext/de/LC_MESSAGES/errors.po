@@ -10,31 +10,31 @@ msgstr ""
 "Project-Id-Version: circularly\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: German\n"
-"PO-Revision-Date: 2021-12-29 09:04\n"
+"PO-Revision-Date: 2021-12-29 15:46\n"
 
 msgid "can't be blank"
-msgstr ""
+msgstr "darf nicht leer sein"
 
 msgid "has already been taken"
-msgstr ""
+msgstr "ist bereits vergeben"
 
 msgid "is invalid"
-msgstr ""
+msgstr "ist ungültig"
 
 msgid "must be accepted"
-msgstr ""
+msgstr "muss angenommen werden"
 
 msgid "has invalid format"
-msgstr ""
+msgstr "ungültiges Format"
 
 msgid "has an invalid entry"
-msgstr ""
+msgstr "enthält einen ungültigen Eintrag"
 
 msgid "is reserved"
-msgstr ""
+msgstr "ist nicht verfügbar"
 
 msgid "does not match confirmation"
-msgstr ""
+msgstr "stimmt nicht überein"
 
 msgid "is still associated with this entry"
 msgstr ""
