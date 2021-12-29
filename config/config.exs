@@ -27,6 +27,8 @@ config :circularly, CircularlyWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :circularly, Circularly.Mailer, adapter: Swoosh.Adapters.Local
 
+config :circularly, Circularly.Gettext, default_locale: "en"
+
 # Swoosh API client is needed for adapters other than SMTP.
 config :swoosh, :api_client, false
 
