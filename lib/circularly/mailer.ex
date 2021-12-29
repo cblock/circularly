@@ -1,3 +1,4 @@
 defmodule Circularly.Mailer do
+  @moduledoc false
   use Swoosh.Mailer, otp_app: :circularly
 end
