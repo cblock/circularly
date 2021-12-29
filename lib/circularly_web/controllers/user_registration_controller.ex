@@ -20,7 +20,7 @@ defmodule CircularlyWeb.UserRegistrationController do
           )
 
         conn
-        |> put_flash(:info, "User created successfully.")
+        |> put_flash(:info, dgettext("auth", "User created successfully."))
         |> UserAuth.log_in_user(user)
 
       {:error, %Ecto.Changeset{} = changeset} ->
