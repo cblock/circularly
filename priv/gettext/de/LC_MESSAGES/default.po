@@ -1,0 +1,19 @@
+msgid ""
+msgstr ""
+"Language: de\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: circularly\n"
+"X-Crowdin-Project-ID: 491981\n"
+"X-Crowdin-Language: de\n"
+"X-Crowdin-File: /develop/priv/gettext/en/LC_MESSAGES/default.po\n"
+"X-Crowdin-File-ID: 23\n"
+"Project-Id-Version: circularly\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: German\n"
+"PO-Revision-Date: 2021-12-29 09:44\n"
+
+#: lib/circularly_web/templates/page/index.html.heex:2
+#, elixir-format, ex-autogen
+msgid "Welcome to %{name}!"
+msgstr ""
+
