@@ -1,25 +1,27 @@
-## "msgid"s in this file come from POT (.pot) files.
-##
-## Do not add, change, or remove "msgid"s manually here as
-## they're tied to the ones in the corresponding POT file
-## (with the same domain).
-##
-## Use "mix gettext.extract --merge" or "mix gettext.merge"
-## to merge POT files into PO files.
 msgid ""
 msgstr ""
 "Language: de\n"
-"Plural-Forms: nplurals=2\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: circularly\n"
+"X-Crowdin-Project-ID: 492085\n"
+"X-Crowdin-Language: de\n"
+"X-Crowdin-File: /main/priv/gettext/en/LC_MESSAGES/default.po\n"
+"X-Crowdin-File-ID: 39\n"
+"Project-Id-Version: circularly\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: German\n"
+"PO-Revision-Date: 2021-12-29 20:44\n"
 
-#, elixir-format, ex-autogen
 #: lib/circularly_web/templates/page/index.html.heex:2
+#, elixir-format, ex-autogen
 msgid "Welcome to %{name}!"
 msgstr ""
 
-#, elixir-format, ex-autogen
 #: lib/circularly_web/templates/user_confirmation/new.html.heex:11
 #: lib/circularly_web/templates/user_registration/new.html.heex:14
 #: lib/circularly_web/templates/user_reset_password/new.html.heex:11
 #: lib/circularly_web/templates/user_session/new.html.heex:11
+#, elixir-format, ex-autogen
 msgid "Or"
 msgstr ""
+
