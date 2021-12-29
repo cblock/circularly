@@ -1,0 +1,179 @@
+## "msgid"s in this file come from POT (.pot) files.
+##
+## Do not add, change, or remove "msgid"s manually here as
+## they're tied to the ones in the corresponding POT file
+## (with the same domain).
+##
+## Use "mix gettext.extract --merge" or "mix gettext.merge"
+## to merge POT files into PO files.
+msgid ""
+msgstr ""
+"Language: en\n"
+"Plural-Forms: nplurals=2\n"
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_confirmation/edit.html.heex:8
+#: lib/circularly_web/templates/user_confirmation/edit.html.heex:17
+msgid "Confirm account"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_confirmation/new.html.heex:20
+#: lib/circularly_web/templates/user_registration/new.html.heex:26
+#: lib/circularly_web/templates/user_reset_password/new.html.heex:20
+#: lib/circularly_web/templates/user_session/new.html.heex:23
+msgid "Email"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_reset_password/new.html.heex:8
+#: lib/circularly_web/templates/user_session/new.html.heex:45
+msgid "Forgot your password?"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/controllers/user_confirmation_controller.ex:22
+msgid "If your email is in our system and it has not been confirmed yet, you will receive an email with instructions shortly."
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/controllers/user_reset_password_controller.ex:24
+msgid "If your email is in our system, you will receive instructions to reset your password shortly."
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/controllers/user_session_controller.ex:18
+msgid "Invalid email or password"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/controllers/user_session_controller.ex:24
+msgid "Logged out successfully."
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_session/new.html.heex:63
+msgid "Or continue with"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_registration/new.html.heex:55
+msgid "Or register with"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_registration/new.html.heex:34
+#: lib/circularly_web/templates/user_reset_password/edit.html.heex:24
+#: lib/circularly_web/templates/user_session/new.html.heex:31
+msgid "Password"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_reset_password/edit.html.heex:31
+msgid "Password confirmation"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/controllers/user_reset_password_controller.ex:42
+msgid "Password reset successfully."
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_registration/new.html.heex:43
+msgid "Register"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_registration/new.html.heex:11
+msgid "Register a new account"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_session/new.html.heex:40
+msgid "Remember me"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_confirmation/new.html.heex:8
+#: lib/circularly_web/templates/user_confirmation/new.html.heex:28
+msgid "Resend confirmation instructions"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_reset_password/edit.html.heex:8
+#: lib/circularly_web/templates/user_reset_password/edit.html.heex:39
+msgid "Reset password"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/controllers/user_reset_password_controller.ex:57
+msgid "Reset password link is invalid or it has expired."
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_session/new.html.heex:51
+msgid "Sign in"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_session/new.html.heex:8
+msgid "Sign in to your account"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_session/new.html.heex:71
+msgid "Sign in with Facebook"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_session/new.html.heex:89
+msgid "Sign in with GitHub"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_session/new.html.heex:80
+msgid "Sign in with Twitter"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_registration/new.html.heex:63
+msgid "Sign up with Facebook"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_registration/new.html.heex:81
+msgid "Sign up with GitHub"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_registration/new.html.heex:72
+msgid "Sign up with Twitter"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/controllers/user_confirmation_controller.ex:56
+msgid "User confirmation link is invalid or it has expired."
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/controllers/user_confirmation_controller.ex:40
+msgid "User confirmed successfully."
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/controllers/user_registration_controller.ex:23
+msgid "User created successfully."
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_confirmation/new.html.heex:12
+#: lib/circularly_web/templates/user_registration/new.html.heex:15
+#: lib/circularly_web/templates/user_reset_password/edit.html.heex:12
+#: lib/circularly_web/templates/user_reset_password/new.html.heex:12
+msgid "sign in to your account"
+msgstr ""
+
+#, elixir-format, ex-autogen
+#: lib/circularly_web/templates/user_session/new.html.heex:12
+msgid "start your 14-day free trial"
+msgstr ""
