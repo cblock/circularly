@@ -1,3 +1,5 @@
+commit_message: "[ci skip] updated i18n translations"
+
 files:
   - source: /priv/gettext/en/LC_MESSAGES/*.po
     translation: /priv/gettext/%two_letters_code%/LC_MESSAGES/%original_file_name%
