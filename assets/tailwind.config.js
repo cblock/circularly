@@ -6,6 +6,12 @@ module.exports = {
     '../lib/*_web.ex',
     '../lib/*_web/**/*.*ex'
   ],
+  safelist: [
+    'bg-blue-50',
+    'text-blue-400',
+    'bg-red-50',
+    'bg-red-400'
+  ],
   theme: {
     extend: {},
   },
