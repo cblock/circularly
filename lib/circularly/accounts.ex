@@ -6,7 +6,7 @@ defmodule Circularly.Accounts do
   import Ecto.Query, warn: false
   alias Circularly.Repo
 
-  alias Circularly.Accounts.{User, UserToken, UserNotifier}
+  alias Circularly.Accounts.{Organization, User, Permission, UserToken, UserNotifier}
 
   ## Database getters
 
@@ -23,7 +23,7 @@ defmodule Circularly.Accounts do
 
   """
   def get_user_by_email(email) when is_binary(email) do
-    Repo.get_by(User, email: email)
+    Repo.get_by(User, [email: email], skip_org_id: true)
   end
 
   @doc """
@@ -40,7 +40,7 @@ defmodule Circularly.Accounts do
   """
   def get_user_by_email_and_password(email, password)
       when is_binary(email) and is_binary(password) do
-    user = Repo.get_by(User, email: email)
+    user = Repo.get_by(User, [email: email], skip_org_id: true)
     if User.valid_password?(user, password), do: user
   end
 
@@ -58,12 +58,13 @@ defmodule Circularly.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id), do: Repo.get!(User, id, skip_org_id: true)
 
   ## User registration
 
   @doc """
-  Registers a user.
+  Registers a user, creates a corresponding organization and creates a permissions record
+  that makes the created user admin in created oranization.
 
   ## Examples
 
@@ -75,9 +76,38 @@ defmodule Circularly.Accounts do
 
   """
   def register_user(attrs) do
-    %User{}
-    |> User.registration_changeset(attrs)
-    |> Repo.insert()
+    attrs = for {k, v} <- attrs, do: {to_string(k), v}, into: %{}
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:organization, %Organization{}, skip_org_id: true)
+    |> Ecto.Multi.insert(
+      :user,
+      fn %{organization: %Organization{org_id: org_id}} ->
+        attrs = Map.put(attrs, "current_organization", org_id)
+
+        %User{}
+        |> User.registration_changeset(attrs)
+      end,
+      skip_org_id: true
+    )
+    |> Ecto.Multi.insert(
+      :permission,
+      fn %{
+           organization: %Organization{org_id: org_id},
+           user: %User{id: user_id}
+         } ->
+        Permission.admin_changeset(%Permission{}, %{user_id: user_id, org_id: org_id})
+      end,
+      skip_org_id: true
+    )
+    |> Repo.transaction()
+    |> case do
+      {:ok, response} ->
+        {:ok, response}
+
+      {:error, :user, user_changeset, _} ->
+        {:error, user_changeset}
+    end
   end
 
   @doc """
@@ -138,7 +168,7 @@ defmodule Circularly.Accounts do
     context = "change:#{user.email}"
 
     with {:ok, query} <- UserToken.verify_change_email_token_query(token, context),
-         %UserToken{sent_to: email} <- Repo.one(query),
+         %UserToken{sent_to: email} <- Repo.one(query, skip_org_id: true),
          {:ok, _} <- Repo.transaction(user_email_multi(user, email, context)) do
       :ok
     else
@@ -153,8 +183,10 @@ defmodule Circularly.Accounts do
       |> User.confirm_changeset()
 
     Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, changeset)
-    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, [context]))
+    |> Ecto.Multi.update(:user, changeset, skip_org_id: true)
+    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, [context]),
+      skip_org_id: true
+    )
   end
 
   @doc """
@@ -170,7 +202,7 @@ defmodule Circularly.Accounts do
       when is_function(update_email_url_fun, 1) do
     {encoded_token, user_token} = UserToken.build_email_token(user, "change:#{current_email}")
 
-    Repo.insert!(user_token)
+    Repo.insert!(user_token, skip_org_id: true)
     UserNotifier.deliver_update_email_instructions(user, update_email_url_fun.(encoded_token))
   end
 
@@ -206,8 +238,10 @@ defmodule Circularly.Accounts do
       |> User.validate_current_password(password)
 
     Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, changeset)
-    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all))
+    |> Ecto.Multi.update(:user, changeset, skip_org_id: true)
+    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all),
+      skip_org_id: true
+    )
     |> Repo.transaction()
     |> case do
       {:ok, %{user: user}} -> {:ok, user}
@@ -222,7 +256,7 @@ defmodule Circularly.Accounts do
   """
   def generate_user_session_token(user) do
     {token, user_token} = UserToken.build_session_token(user)
-    Repo.insert!(user_token)
+    Repo.insert!(user_token, skip_org_id: true)
     token
   end
 
@@ -231,14 +265,14 @@ defmodule Circularly.Accounts do
   """
   def get_user_by_session_token(token) do
     {:ok, query} = UserToken.verify_session_token_query(token)
-    Repo.one(query)
+    Repo.one(query, skip_org_id: true)
   end
 
   @doc """
   Deletes the signed token with the given context.
   """
   def delete_session_token(token) do
-    Repo.delete_all(UserToken.token_and_context_query(token, "session"))
+    Repo.delete_all(UserToken.token_and_context_query(token, "session"), skip_org_id: true)
     :ok
   end
 
@@ -262,7 +296,7 @@ defmodule Circularly.Accounts do
       {:error, :already_confirmed}
     else
       {encoded_token, user_token} = UserToken.build_email_token(user, "confirm")
-      Repo.insert!(user_token)
+      Repo.insert!(user_token, skip_org_id: true)
       UserNotifier.deliver_confirmation_instructions(user, confirmation_url_fun.(encoded_token))
     end
   end
@@ -275,7 +309,7 @@ defmodule Circularly.Accounts do
   """
   def confirm_user(token) do
     with {:ok, query} <- UserToken.verify_email_token_query(token, "confirm"),
-         %User{} = user <- Repo.one(query),
+         %User{} = user <- Repo.one(query, skip_org_id: true),
          {:ok, %{user: user}} <- Repo.transaction(confirm_user_multi(user)) do
       {:ok, user}
     else
@@ -285,8 +319,10 @@ defmodule Circularly.Accounts do
 
   defp confirm_user_multi(user) do
     Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, User.confirm_changeset(user))
-    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, ["confirm"]))
+    |> Ecto.Multi.update(:user, User.confirm_changeset(user), skip_org_id: true)
+    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, ["confirm"]),
+      skip_org_id: true
+    )
   end
 
   ## Reset password
@@ -303,7 +339,7 @@ defmodule Circularly.Accounts do
   def deliver_user_reset_password_instructions(%User{} = user, reset_password_url_fun)
       when is_function(reset_password_url_fun, 1) do
     {encoded_token, user_token} = UserToken.build_email_token(user, "reset_password")
-    Repo.insert!(user_token)
+    Repo.insert!(user_token, skip_org_id: true)
     UserNotifier.deliver_reset_password_instructions(user, reset_password_url_fun.(encoded_token))
   end
 
@@ -321,7 +357,7 @@ defmodule Circularly.Accounts do
   """
   def get_user_by_reset_password_token(token) do
     with {:ok, query} <- UserToken.verify_email_token_query(token, "reset_password"),
-         %User{} = user <- Repo.one(query) do
+         %User{} = user <- Repo.one(query, skip_org_id: true) do
       user
     else
       _ -> nil
@@ -342,8 +378,10 @@ defmodule Circularly.Accounts do
   """
   def reset_user_password(user, attrs) do
     Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, User.password_changeset(user, attrs))
-    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all))
+    |> Ecto.Multi.update(:user, User.password_changeset(user, attrs), skip_org_id: true)
+    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all),
+      skip_org_id: true
+    )
     |> Repo.transaction()
     |> case do
       {:ok, %{user: user}} -> {:ok, user}

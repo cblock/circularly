@@ -15,7 +15,7 @@ defmodule Circularly.AccountsFixtures do
   end
 
   def user_fixture(attrs \\ %{}) do
-    {:ok, user} =
+    {:ok, %{user: user}} =
       attrs
       |> valid_user_attributes()
       |> Circularly.Accounts.register_user()

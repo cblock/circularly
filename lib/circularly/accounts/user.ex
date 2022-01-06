@@ -10,7 +10,7 @@ defmodule Circularly.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
-
+    field :current_organization, :binary_id
     timestamps()
   end
 
@@ -33,7 +33,7 @@ defmodule Circularly.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :current_organization])
     |> validate_email()
     |> validate_password(opts)
   end
@@ -43,7 +43,7 @@ defmodule Circularly.Accounts.User do
     |> validate_required([:email])
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
-    |> unsafe_validate_unique(:email, Circularly.Repo)
+    |> unsafe_validate_unique(:email, Circularly.Repo, repo_opts: [skip_org_id: true])
     |> unique_constraint(:email)
   end
 

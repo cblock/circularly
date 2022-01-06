@@ -89,11 +89,24 @@ defmodule Circularly.AccountsTest do
 
     test "registers users with a hashed password" do
       email = unique_user_email()
-      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
+      {:ok, %{user: user}} = Accounts.register_user(valid_user_attributes(email: email))
       assert user.email == email
       assert is_binary(user.hashed_password)
       assert is_nil(user.confirmed_at)
       assert is_nil(user.password)
+    end
+
+    test "registers user, creates organization and grants admin permission to that organization" do
+      email = unique_user_email()
+
+      {:ok, %{user: user, organization: organization, permission: permission}} =
+        Accounts.register_user(valid_user_attributes(email: email))
+
+      assert user.email == email
+      assert user.current_organization == organization.org_id
+      assert permission.org_id == organization.org_id
+      assert permission.user_id == user.id
+      assert permission.rights == [:Admin]
     end
   end
 
@@ -189,7 +202,10 @@ defmodule Circularly.AccountsTest do
         end)
 
       {:ok, token} = Base.url_decode64(token, padding: false)
-      assert user_token = Repo.get_by(UserToken, token: :crypto.hash(:sha256, token))
+
+      assert user_token =
+               Repo.get_by(UserToken, [token: :crypto.hash(:sha256, token)], skip_org_id: true)
+
       assert user_token.user_id == user.id
       assert user_token.sent_to == user.email
       assert user_token.context == "change:current@example.com"
@@ -211,31 +227,35 @@ defmodule Circularly.AccountsTest do
 
     test "updates the email with a valid token", %{user: user, token: token, email: email} do
       assert Accounts.update_user_email(user, token) == :ok
-      changed_user = Repo.get!(User, user.id)
+      changed_user = Repo.get!(User, user.id, skip_org_id: true)
       assert changed_user.email != user.email
       assert changed_user.email == email
       assert changed_user.confirmed_at
       assert changed_user.confirmed_at != user.confirmed_at
-      refute Repo.get_by(UserToken, user_id: user.id)
+      refute Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not update email with invalid token", %{user: user} do
       assert Accounts.update_user_email(user, "oops") == :error
-      assert Repo.get!(User, user.id).email == user.email
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get!(User, user.id, skip_org_id: true).email == user.email
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not update email if user email changed", %{user: user, token: token} do
       assert Accounts.update_user_email(%{user | email: "current@example.com"}, token) == :error
-      assert Repo.get!(User, user.id).email == user.email
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get!(User, user.id, skip_org_id: true).email == user.email
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not update email if token expired", %{user: user, token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+      {1, nil} =
+        Repo.update_all(UserToken, [set: [inserted_at: ~N[2020-01-01 00:00:00]]],
+          skip_org_id: true
+        )
+
       assert Accounts.update_user_email(user, token) == :error
-      assert Repo.get!(User, user.id).email == user.email
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get!(User, user.id, skip_org_id: true).email == user.email
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
   end
 
@@ -312,7 +332,7 @@ defmodule Circularly.AccountsTest do
           password: "New valid password!"
         })
 
-      refute Repo.get_by(UserToken, user_id: user.id)
+      refute Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
   end
 
@@ -323,7 +343,7 @@ defmodule Circularly.AccountsTest do
 
     test "generates a token", %{user: user} do
       token = Accounts.generate_user_session_token(user)
-      assert user_token = Repo.get_by(UserToken, token: token)
+      assert user_token = Repo.get_by(UserToken, [token: token], skip_org_id: true)
       assert user_token.context == "session"
 
       # Creating the same token for another user should fail
@@ -354,7 +374,11 @@ defmodule Circularly.AccountsTest do
     end
 
     test "does not return user for expired token", %{token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+      {1, nil} =
+        Repo.update_all(UserToken, [set: [inserted_at: ~N[2020-01-01 00:00:00]]],
+          skip_org_id: true
+        )
+
       refute Accounts.get_user_by_session_token(token)
     end
   end
@@ -380,7 +404,10 @@ defmodule Circularly.AccountsTest do
         end)
 
       {:ok, token} = Base.url_decode64(token, padding: false)
-      assert user_token = Repo.get_by(UserToken, token: :crypto.hash(:sha256, token))
+
+      assert user_token =
+               Repo.get_by(UserToken, [token: :crypto.hash(:sha256, token)], skip_org_id: true)
+
       assert user_token.user_id == user.id
       assert user_token.sent_to == user.email
       assert user_token.context == "confirm"
@@ -403,21 +430,25 @@ defmodule Circularly.AccountsTest do
       assert {:ok, confirmed_user} = Accounts.confirm_user(token)
       assert confirmed_user.confirmed_at
       assert confirmed_user.confirmed_at != user.confirmed_at
-      assert Repo.get!(User, user.id).confirmed_at
-      refute Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get!(User, user.id, skip_org_id: true).confirmed_at
+      refute Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not confirm with invalid token", %{user: user} do
       assert Accounts.confirm_user("oops") == :error
-      refute Repo.get!(User, user.id).confirmed_at
-      assert Repo.get_by(UserToken, user_id: user.id)
+      refute Repo.get!(User, user.id, skip_org_id: true).confirmed_at
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not confirm email if token expired", %{user: user, token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+      {1, nil} =
+        Repo.update_all(UserToken, [set: [inserted_at: ~N[2020-01-01 00:00:00]]],
+          skip_org_id: true
+        )
+
       assert Accounts.confirm_user(token) == :error
-      refute Repo.get!(User, user.id).confirmed_at
-      assert Repo.get_by(UserToken, user_id: user.id)
+      refute Repo.get!(User, user.id, skip_org_id: true).confirmed_at
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
   end
 
@@ -433,7 +464,10 @@ defmodule Circularly.AccountsTest do
         end)
 
       {:ok, token} = Base.url_decode64(token, padding: false)
-      assert user_token = Repo.get_by(UserToken, token: :crypto.hash(:sha256, token))
+
+      assert user_token =
+               Repo.get_by(UserToken, [token: :crypto.hash(:sha256, token)], skip_org_id: true)
+
       assert user_token.user_id == user.id
       assert user_token.sent_to == user.email
       assert user_token.context == "reset_password"
@@ -454,18 +488,22 @@ defmodule Circularly.AccountsTest do
 
     test "returns the user with valid token", %{user: %{id: id}, token: token} do
       assert %User{id: ^id} = Accounts.get_user_by_reset_password_token(token)
-      assert Repo.get_by(UserToken, user_id: id)
+      assert Repo.get_by(UserToken, [user_id: id], skip_org_id: true)
     end
 
     test "does not return the user with invalid token", %{user: user} do
       refute Accounts.get_user_by_reset_password_token("oops")
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not return the user if token expired", %{user: user, token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+      {1, nil} =
+        Repo.update_all(UserToken, [set: [inserted_at: ~N[2020-01-01 00:00:00]]],
+          skip_org_id: true
+        )
+
       refute Accounts.get_user_by_reset_password_token(token)
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
   end
 
@@ -505,7 +543,7 @@ defmodule Circularly.AccountsTest do
     test "deletes all tokens for the given user", %{user: user} do
       _ = Accounts.generate_user_session_token(user)
       {:ok, _} = Accounts.reset_user_password(user, %{password: "New valid password!"})
-      refute Repo.get_by(UserToken, user_id: user.id)
+      refute Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
   end
 
