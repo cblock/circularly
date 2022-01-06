@@ -31,3 +31,6 @@ config :logger, level: :warn
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+# Set locale to "en" for tests in order not to break pattern mathcing in integration tests
+config :circularly, CircularlyWeb.Gettext, default_locale: "en"
