@@ -85,7 +85,7 @@ defmodule Circularly.Accounts do
            organization: %Organization{org_id: org_id},
            user: %User{id: user_id}
          } ->
-        Permission.admin_changeset(%Permission{}, %{user_id: user_id, org_id: org_id})
+        Permission.grant_admin_changeset(%Permission{}, %{user_id: user_id, org_id: org_id})
       end,
       skip_org_id: true
     )

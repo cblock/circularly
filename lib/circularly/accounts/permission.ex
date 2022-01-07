@@ -16,9 +16,9 @@ defmodule Circularly.Accounts.Permission do
   end
 
   @doc """
-  Grants admin role to the user in the organization
+  Grants admin role to the given user in the given organization
   """
-  def admin_changeset(permission, attrs) do
+  def grant_admin_changeset(permission, attrs) do
     permission
     |> cast(attrs, [:org_id, :user_id])
     |> validate_required([:org_id, :user_id])
