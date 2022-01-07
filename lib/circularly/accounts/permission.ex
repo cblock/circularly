@@ -10,7 +10,10 @@ defmodule Circularly.Accounts.Permission do
   schema "permissions" do
     field :rights, {:array, Ecto.Enum}, values: [:User, :Admin]
     belongs_to :user, Circularly.Accounts.User
-    belongs_to :organization, Circularly.Accounts.Organization, foreign_key: :org_id
+
+    belongs_to :organization, Circularly.Accounts.Organization,
+      foreign_key: :org_id,
+      references: :org_id
 
     timestamps()
   end
