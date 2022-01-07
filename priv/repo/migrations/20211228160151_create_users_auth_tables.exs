@@ -9,7 +9,6 @@ defmodule Circularly.Repo.Migrations.CreateUsersAuthTables do
       add :email, :citext, null: false
       add :hashed_password, :string, null: false
       add :confirmed_at, :utc_datetime
-      add :current_organization, :binary_id
       timestamps(type: :utc_datetime)
     end
 

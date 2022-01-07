@@ -76,20 +76,9 @@ defmodule Circularly.Accounts do
 
   """
   def register_user(attrs) do
-    attrs = for {k, v} <- attrs, do: {to_string(k), v}, into: %{}
-
     Ecto.Multi.new()
+    |> Ecto.Multi.insert(:user, User.registration_changeset(%User{}, attrs), skip_org_id: true)
     |> Ecto.Multi.insert(:organization, %Organization{}, skip_org_id: true)
-    |> Ecto.Multi.insert(
-      :user,
-      fn %{organization: %Organization{org_id: org_id}} ->
-        attrs = Map.put(attrs, "current_organization", org_id)
-
-        %User{}
-        |> User.registration_changeset(attrs)
-      end,
-      skip_org_id: true
-    )
     |> Ecto.Multi.insert(
       :permission,
       fn %{

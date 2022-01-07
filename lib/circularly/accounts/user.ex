@@ -10,7 +10,6 @@ defmodule Circularly.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
-    field :current_organization, :binary_id
     timestamps()
   end
 
@@ -33,7 +32,7 @@ defmodule Circularly.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password, :current_organization])
+    |> cast(attrs, [:email, :password])
     |> validate_email()
     |> validate_password(opts)
   end

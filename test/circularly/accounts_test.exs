@@ -103,7 +103,6 @@ defmodule Circularly.AccountsTest do
         Accounts.register_user(valid_user_attributes(email: email))
 
       assert user.email == email
-      assert user.current_organization == organization.org_id
       assert permission.org_id == organization.org_id
       assert permission.user_id == user.id
       assert permission.rights == [:Admin]
