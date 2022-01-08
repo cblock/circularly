@@ -7,6 +7,11 @@ defmodule Circularly.Accounts.Organization do
   schema "organizations" do
     field :name, :string
 
+    has_many :permissions, Circularly.Accounts.Permission,
+      foreign_key: :org_id,
+      references: :org_id
+
+    has_many :permitted_users, through: [:permissions, :user]
     timestamps()
   end
 
