@@ -551,4 +551,87 @@ defmodule Circularly.AccountsTest do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end
   end
+
+  describe "organizations" do
+    alias Circularly.Accounts.{Organization, Permission}
+
+    import Circularly.AccountsFixtures
+
+    @invalid_attrs %{name: nil}
+
+    test "list_organizations_for/1 returns all organizations of a user" do
+      %{organization: organization, user: user} = user_permission_organization_fixture()
+      assert Accounts.list_organizations_for(user) == [organization]
+    end
+
+    test "get_organization_for!/2 returns the organization with given id" do
+      %{organization: organization, user: user} = user_permission_organization_fixture()
+      assert Accounts.get_organization_for!(user, organization.org_id) == organization
+    end
+
+    test "get_organization_for!/2 raises error if for an organization the user has no permission to access" do
+      %{organization: organization, user: user} = user_permission_organization_fixture()
+      organization2 = organization_fixture()
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Accounts.get_organization_for!(user, organization2.org_id)
+      end
+    end
+
+    test "create_organization_for/2 with valid data creates a organization" do
+      user = user_fixture()
+      valid_attrs = %{name: "some name"}
+
+      assert {:ok, %Organization{} = organization} =
+               Accounts.create_organization_for(user, valid_attrs)
+
+      assert organization.name == "some name"
+
+      assert Repo.get_by(
+               Permission,
+               [user_id: user.id, org_id: organization.org_id, rights: [:Admin]],
+               skip_org_id: true
+             )
+    end
+
+    test "update_organization/3 with valid data updates the organization" do
+      %{organization: org, user: user} = user_permission_organization_fixture()
+      update_attrs = %{name: "some updated name"}
+
+      assert {:ok, %Organization{} = organization} =
+               Accounts.update_organization_for(user, org, update_attrs)
+
+      assert organization.name == "some updated name"
+    end
+
+    test "update_organization/3 returns an error if user has no admin permission for that organization" do
+      %{organization: org1, user: user} = user_permission_organization_fixture()
+      org2 = organization_fixture()
+      update_attrs = %{name: "some updated name"}
+
+      assert {:error, "Not permitted"} =
+               Accounts.update_organization_for(user, org2, update_attrs)
+    end
+
+    test "delete_organization_for/2 deletes the organization" do
+      %{organization: organization, user: user} = user_permission_organization_fixture()
+      assert {:ok, %Organization{}} = Accounts.delete_organization_for(user, organization)
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Accounts.get_organization_for!(user, organization.org_id)
+      end
+    end
+
+    test "delete_organization_for/2 returns an error if user has no admin permission for that organization" do
+      %{organization: org1, user: user} = user_permission_organization_fixture()
+      org2 = organization_fixture()
+
+      assert {:error, "Not permitted"} = Accounts.delete_organization_for(user, org2)
+    end
+
+    test "change_organization_for/1 returns a organization changeset" do
+      organization = organization_fixture()
+      assert %Ecto.Changeset{} = Accounts.change_organization(organization)
+    end
+  end
 end

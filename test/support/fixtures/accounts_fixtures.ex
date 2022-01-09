@@ -4,6 +4,12 @@ defmodule Circularly.AccountsFixtures do
   entities via the `Circularly.Accounts` context.
   """
 
+  def extract_user_token(fun) do
+    {:ok, captured_email} = fun.(&"[TOKEN]#{&1}[TOKEN]")
+    [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
+    token
+  end
+
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
   def valid_user_password, do: "Hello world!"
 
@@ -14,18 +20,29 @@ defmodule Circularly.AccountsFixtures do
     })
   end
 
-  def user_fixture(attrs \\ %{}) do
-    {:ok, %{user: user}} =
+  @doc """
+  Generate a user, an organization and an admin permission for the user in the organization.
+  """
+  def user_permission_organization_fixture(attrs \\ %{}) do
+    {:ok, %{organization: organization, user: user, permission: permission}} =
       attrs
       |> valid_user_attributes()
       |> Circularly.Accounts.register_user()
 
+    %{organization: organization, user: user, permission: permission}
+  end
+
+  @spec user_fixture(any) :: User.t()
+  def user_fixture(attrs \\ %{}) do
+    %{user: user} = user_permission_organization_fixture(attrs)
     user
   end
 
-  def extract_user_token(fun) do
-    {:ok, captured_email} = fun.(&"[TOKEN]#{&1}[TOKEN]")
-    [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
-    token
+  @doc """
+  Generate a organization.
+  """
+  def organization_fixture(attrs \\ %{}) do
+    %{organization: organization} = user_permission_organization_fixture(attrs)
+    organization
   end
 end

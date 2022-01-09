@@ -344,6 +344,7 @@ defmodule Circularly.Accounts do
       nil
 
   """
+  @spec get_user_by_reset_password_token(binary) :: nil | User.t()
   def get_user_by_reset_password_token(token) do
     with {:ok, query} <- UserToken.verify_email_token_query(token, "reset_password"),
          %User{} = user <- Repo.one(query, skip_org_id: true) do
@@ -376,5 +377,151 @@ defmodule Circularly.Accounts do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
+  end
+
+  @doc """
+  Returns the list of organizations a user is permitted to access.
+
+  ## Examples
+
+      iex> list_users_organizations(current_user)
+      [%Organization{}, ...]
+
+  """
+  @spec list_organizations_for(User.t()) :: [Organization.t()]
+  def list_organizations_for(user) do
+    Repo.preload(user, :permitted_organizations, skip_org_id: true).permitted_organizations
+  end
+
+  @doc """
+  Gets a single organization the given user has permission to access.
+
+  Raises `Ecto.NoResultsError` if the Organization does not exist.
+
+  ## Examples
+
+      iex> get_organization_for!(current_user, "11111111-dead-beef-1111-111111111111")
+      %Organization{}
+
+      iex> get_organization_for!(current_user, "11111111-dead-beef-1111-000000000000")
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec get_organization_for!(User.t(), binary()) :: Organization | nil
+  def get_organization_for!(user, id) do
+    query =
+      from o in Circularly.Accounts.Organization,
+        join: p in Circularly.Accounts.Permission,
+        on: o.org_id == p.org_id,
+        where: p.user_id == ^user.id and o.org_id == ^id
+
+    Repo.one!(query, skip_org_id: true)
+  end
+
+  @doc """
+  Creates a organization for a given user and set permission for this user to admin.
+
+  ## Examples
+
+      iex> create_organization_for(current_user, %{field: value})
+      {:ok, %Organization{}}
+
+      iex> create_organization_for(current_user, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  @spec create_organization_for(User.t(), %{}) ::
+          {:error, Ecto.Changeset.t()} | {:ok, Organization.t()}
+  def create_organization_for(user, attrs \\ %{}) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:organization, Organization.changeset(%Organization{}, attrs))
+    |> Ecto.Multi.insert(
+      :permission,
+      fn %{organization: %Organization{org_id: org_id}} ->
+        Permission.grant_admin_changeset(%Permission{}, %{user_id: user.id, org_id: org_id})
+      end,
+      skip_org_id: true
+    )
+    |> Repo.transaction()
+    |> case do
+      {:ok, response} ->
+        {:ok, response.organization}
+
+      {:error, :organization, organization_changeset, _} ->
+        {:error, organization_changeset}
+    end
+  end
+
+  @doc """
+  Updates a organization if the given user has admin privileges.
+
+  ## Examples
+
+      iex> update_organization_for(current_user, organization, %{field: new_value})
+      {:ok, %Organization{}}
+
+      iex> update_organization_for(current_user, other_organization, %{field: new_value})
+      {:error, "Not permitted"}
+
+      iex> update_organization_for(current_user, organization, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  @spec update_organization_for(User.t(), Organization.t(), %{}) ::
+          {:ok, Organization.t()} | {:error, %{}} | {:error, binary}
+  def update_organization_for(user, %Organization{} = organization, attrs) do
+    if has_admin_rights(user, organization) do
+      organization
+      |> Organization.changeset(attrs)
+      |> Repo.update(skip_org_id: true)
+    else
+      {:error, "Not permitted"}
+    end
+  end
+
+  @doc """
+  Deletes an organization if the given user has admin privileges..
+
+  ## Examples
+
+      iex> delete_organization_for(user, organization)
+      {:ok, %Organization{}}
+
+      iex> delete_organization_for(user, organization)
+      {:error, %Ecto.Changeset{}}
+
+      iex> delete_organization_for(user, other_organization)
+      {:error, "Not permitted"}
+
+  """
+  @spec delete_organization_for(User.t(), Organization.t()) ::
+          {:ok, Organization.t()} | {:error, %{}} | {:error, binary}
+  def delete_organization_for(user, %Organization{} = organization) do
+    if has_admin_rights(user, organization) do
+      Repo.delete(organization)
+    else
+      {:error, "Not permitted"}
+    end
+  end
+
+  defp has_admin_rights(user, organization) do
+    Repo.get_by(
+      Permission,
+      [user_id: user.id, org_id: organization.org_id, rights: [:Admin]],
+      skip_org_id: true
+    )
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking organization changes.
+
+  ## Examples
+
+      iex> change_organization(organization)
+      %Ecto.Changeset{data: %Organization{}}
+
+  """
+  def change_organization(%Organization{} = organization, attrs \\ %{}) do
+    Organization.changeset(organization, attrs)
   end
 end
