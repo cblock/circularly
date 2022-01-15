@@ -110,6 +110,15 @@ defmodule CircularlyWeb.UserAuth do
   end
 
   @doc """
+  Retrieves current user from user_token and assigns it to the given (liveview) socket as :current_user
+  """
+  def assign_current_user_to_socket(socket, user_token) do
+    Phoenix.LiveView.assign_new(socket, :current_user, fn ->
+      Accounts.get_user_by_session_token(user_token)
+    end)
+  end
+
+  @doc """
   Used for routes that require the user to not be authenticated.
   """
   def redirect_if_user_is_authenticated(conn, _opts) do

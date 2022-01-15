@@ -1,5 +1,5 @@
 defmodule CircularlyWeb.PageControllerTest do
-  use CircularlyWeb.ConnCase
+  use CircularlyWeb.ConnCase, async: true
 
   test "GET /", %{conn: conn} do
     conn = get(conn, "/")
