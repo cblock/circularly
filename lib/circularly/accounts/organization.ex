@@ -2,6 +2,8 @@ defmodule Circularly.Accounts.Organization do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Phoenix.Param, key: :org_id}
+
   @primary_key {:org_id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "organizations" do
