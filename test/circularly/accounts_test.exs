@@ -557,7 +557,8 @@ defmodule Circularly.AccountsTest do
 
     import Circularly.AccountsFixtures
 
-    @invalid_attrs %{name: nil}
+    # currently no invalid attribtues for organization entity
+    # @invalid_attrs %{name: nil}
 
     test "list_organizations_for/1 returns all organizations of a user" do
       %{organization: organization, user: user} = user_permission_organization_fixture()
@@ -570,7 +571,7 @@ defmodule Circularly.AccountsTest do
     end
 
     test "get_organization_for!/2 raises error if for an organization the user has no permission to access" do
-      %{organization: organization, user: user} = user_permission_organization_fixture()
+      user = user_fixture()
       organization2 = organization_fixture()
 
       assert_raise Ecto.NoResultsError, fn ->
@@ -605,7 +606,7 @@ defmodule Circularly.AccountsTest do
     end
 
     test "update_organization/3 returns an error if user has no admin permission for that organization" do
-      %{organization: org1, user: user} = user_permission_organization_fixture()
+      user = user_fixture()
       org2 = organization_fixture()
       update_attrs = %{name: "some updated name"}
 
@@ -623,7 +624,7 @@ defmodule Circularly.AccountsTest do
     end
 
     test "delete_organization_for/2 returns an error if user has no admin permission for that organization" do
-      %{organization: org1, user: user} = user_permission_organization_fixture()
+      user = user_fixture()
       org2 = organization_fixture()
 
       assert {:error, "Not permitted"} = Accounts.delete_organization_for(user, org2)
