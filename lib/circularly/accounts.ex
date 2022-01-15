@@ -22,6 +22,7 @@ defmodule Circularly.Accounts do
       nil
 
   """
+  @spec get_user_by_email(String.t()) :: %User{} | nil
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, [email: email], skip_org_id: true)
   end
@@ -38,6 +39,7 @@ defmodule Circularly.Accounts do
       nil
 
   """
+  @spec get_user_by_email_and_password(String.t(), String.t()) :: %User{} | nil
   def get_user_by_email_and_password(email, password)
       when is_binary(email) and is_binary(password) do
     user = Repo.get_by(User, [email: email], skip_org_id: true)
@@ -58,6 +60,7 @@ defmodule Circularly.Accounts do
       ** (Ecto.NoResultsError)
 
   """
+  @spec get_user!(String.t()) :: %User{} | Ecto.NoResultsError.t()
   def get_user!(id), do: Repo.get!(User, id, skip_org_id: true)
 
   ## User registration
@@ -75,6 +78,7 @@ defmodule Circularly.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec register_user(%{}) :: {:error, %Ecto.Changeset{}} | {:ok, %User{}}
   def register_user(attrs) do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:user, User.registration_changeset(%User{}, attrs), skip_org_id: true)
@@ -108,6 +112,7 @@ defmodule Circularly.Accounts do
       %Ecto.Changeset{data: %User{}}
 
   """
+  @spec change_user_registration(%User{}, %{}) :: %Ecto.Changeset{}
   def change_user_registration(%User{} = user, attrs \\ %{}) do
     User.registration_changeset(user, attrs, hash_password: false)
   end
@@ -123,6 +128,7 @@ defmodule Circularly.Accounts do
       %Ecto.Changeset{data: %User{}}
 
   """
+  @spec change_user_email(%User{}, %{}) :: %Ecto.Changeset{}
   def change_user_email(user, attrs \\ %{}) do
     User.email_changeset(user, attrs)
   end
@@ -140,6 +146,7 @@ defmodule Circularly.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec apply_user_email(%User{}, String.t(), %{}) :: {:ok, %User{}} | {:error, %Ecto.Changeset{}}
   def apply_user_email(user, password, attrs) do
     user
     |> User.email_changeset(attrs)
@@ -153,6 +160,7 @@ defmodule Circularly.Accounts do
   If the token matches, the user email is updated and the token is deleted.
   The confirmed_at date is also updated to the current time.
   """
+  @spec update_user_email(%User{}, String.t()) :: :error | :ok
   def update_user_email(user, token) do
     context = "change:#{user.email}"
 
@@ -187,6 +195,8 @@ defmodule Circularly.Accounts do
       {:ok, %{to: ..., body: ...}}
 
   """
+  @spec deliver_update_email_instructions(%User{}, String.t(), (any -> any)) ::
+          {:error, any} | {:ok, Swoosh.Email.t()}
   def deliver_update_email_instructions(%User{} = user, current_email, update_email_url_fun)
       when is_function(update_email_url_fun, 1) do
     {encoded_token, user_token} = UserToken.build_email_token(user, "change:#{current_email}")
@@ -204,6 +214,7 @@ defmodule Circularly.Accounts do
       %Ecto.Changeset{data: %User{}}
 
   """
+  @spec change_user_password(%User{}, %{}) :: %Ecto.Changeset{}
   def change_user_password(user, attrs \\ %{}) do
     User.password_changeset(user, attrs, hash_password: false)
   end
@@ -220,6 +231,8 @@ defmodule Circularly.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec update_user_password(%User{}, String.t(), %{}) ::
+          {:error, %Ecto.Changeset{}} | {:ok, %User{}}
   def update_user_password(user, password, attrs) do
     changeset =
       user
@@ -243,6 +256,7 @@ defmodule Circularly.Accounts do
   @doc """
   Generates a session token.
   """
+  @spec generate_user_session_token(%User{}) :: String.t()
   def generate_user_session_token(user) do
     {token, user_token} = UserToken.build_session_token(user)
     Repo.insert!(user_token, skip_org_id: true)
@@ -252,6 +266,7 @@ defmodule Circularly.Accounts do
   @doc """
   Gets the user with the given signed token.
   """
+  @spec get_user_by_session_token(String.t()) :: %User{} | nil | Ecto.MultipleResultsError
   def get_user_by_session_token(token) do
     {:ok, query} = UserToken.verify_session_token_query(token)
     Repo.one(query, skip_org_id: true)
@@ -260,6 +275,7 @@ defmodule Circularly.Accounts do
   @doc """
   Deletes the signed token with the given context.
   """
+  @spec delete_session_token(String.t()) :: :ok
   def delete_session_token(token) do
     Repo.delete_all(UserToken.token_and_context_query(token, "session"), skip_org_id: true)
     :ok
@@ -279,6 +295,8 @@ defmodule Circularly.Accounts do
       {:error, :already_confirmed}
 
   """
+  @spec deliver_user_confirmation_instructions(%User{}, (any -> any)) ::
+          {:error, any} | {:ok, Swoosh.Email.t()}
   def deliver_user_confirmation_instructions(%User{} = user, confirmation_url_fun)
       when is_function(confirmation_url_fun, 1) do
     if user.confirmed_at do
@@ -296,6 +314,7 @@ defmodule Circularly.Accounts do
   If the token matches, the user account is marked as confirmed
   and the token is deleted.
   """
+  @spec confirm_user(String.t()) :: :error | {:ok, %User{}}
   def confirm_user(token) do
     with {:ok, query} <- UserToken.verify_email_token_query(token, "confirm"),
          %User{} = user <- Repo.one(query, skip_org_id: true),
@@ -325,6 +344,8 @@ defmodule Circularly.Accounts do
       {:ok, %{to: ..., body: ...}}
 
   """
+  @spec deliver_user_reset_password_instructions(%User{}, (any -> any)) ::
+          {:error, any} | {:ok, Swoosh.Email.t()}
   def deliver_user_reset_password_instructions(%User{} = user, reset_password_url_fun)
       when is_function(reset_password_url_fun, 1) do
     {encoded_token, user_token} = UserToken.build_email_token(user, "reset_password")
@@ -344,7 +365,7 @@ defmodule Circularly.Accounts do
       nil
 
   """
-  @spec get_user_by_reset_password_token(binary) :: nil | User.t()
+  @spec get_user_by_reset_password_token(String.t()) :: nil | %User{}
   def get_user_by_reset_password_token(token) do
     with {:ok, query} <- UserToken.verify_email_token_query(token, "reset_password"),
          %User{} = user <- Repo.one(query, skip_org_id: true) do
@@ -366,6 +387,7 @@ defmodule Circularly.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec reset_user_password(%User{}, %{}) :: {:error, any} | {:ok, any}
   def reset_user_password(user, attrs) do
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, User.password_changeset(user, attrs), skip_org_id: true)
@@ -388,7 +410,7 @@ defmodule Circularly.Accounts do
       [%Organization{}, ...]
 
   """
-  @spec list_organizations_for(User.t()) :: [Organization.t()]
+  @spec list_organizations_for(%User{}) :: [%Organization{}] | nil
   def list_organizations_for(user) do
     Repo.preload(user, :permitted_organizations, skip_org_id: true).permitted_organizations
   end
@@ -407,7 +429,7 @@ defmodule Circularly.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_organization_for!(User.t(), binary()) :: Organization | nil
+  @spec get_organization_for!(%User{}, String.t()) :: %Organization{} | Ecto.NoResultsError.t()
   def get_organization_for!(user, id) do
     query =
       from o in Circularly.Accounts.Organization,
@@ -430,8 +452,8 @@ defmodule Circularly.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_organization_for(User.t(), %{}) ::
-          {:error, Ecto.Changeset.t()} | {:ok, Organization.t()}
+  @spec create_organization_for(%User{}, %{}) ::
+          {:error, %Ecto.Changeset{}} | {:ok, %Organization{}}
   def create_organization_for(user, attrs \\ %{}) do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:organization, Organization.changeset(%Organization{}, attrs))
@@ -467,8 +489,8 @@ defmodule Circularly.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_organization_for(User.t(), Organization.t(), %{}) ::
-          {:ok, Organization.t()} | {:error, %{}} | {:error, binary}
+  @spec update_organization_for(%User{}, %Organization{}, %{}) ::
+          {:ok, %Organization{}} | {:error, %Ecto.Changeset{}} | {:error, String.t()}
   def update_organization_for(user, %Organization{} = organization, attrs) do
     if has_admin_rights(user, organization) do
       organization
@@ -494,8 +516,8 @@ defmodule Circularly.Accounts do
       {:error, "Not permitted"}
 
   """
-  @spec delete_organization_for(User.t(), Organization.t()) ::
-          {:ok, Organization.t()} | {:error, %{}} | {:error, binary}
+  @spec delete_organization_for(%User{}, %Organization{}) ::
+          {:ok, %Organization{}} | {:error, %Ecto.Changeset{}} | {:error, String.t()}
   def delete_organization_for(user, %Organization{} = organization) do
     if has_admin_rights(user, organization) do
       Repo.delete(organization)
@@ -521,6 +543,7 @@ defmodule Circularly.Accounts do
       %Ecto.Changeset{data: %Organization{}}
 
   """
+  @spec change_organization(%Organization{}, %{}) :: Ecto.Changeset.t()
   def change_organization(%Organization{} = organization, attrs \\ %{}) do
     Organization.changeset(organization, attrs)
   end
