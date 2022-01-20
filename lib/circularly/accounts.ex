@@ -406,13 +406,19 @@ defmodule Circularly.Accounts do
 
   ## Examples
 
-      iex> list_users_organizations(current_user)
+      iex> list_organizations_for(current_user)
       [%Organization{}, ...]
 
   """
-  @spec list_organizations_for(%User{}) :: [%Organization{}] | nil
+  @spec list_organizations_for(%User{}) :: [%Organization{}]
   def list_organizations_for(user) do
-    Repo.preload(user, :permitted_organizations, skip_org_id: true).permitted_organizations
+    query =
+      from o in Circularly.Accounts.Organization,
+        join: p in Circularly.Accounts.Permission,
+        on: o.org_id == p.org_id,
+        where: p.user_id == ^user.id
+
+    Repo.all(query, skip_org_id: true)
   end
 
   @doc """
