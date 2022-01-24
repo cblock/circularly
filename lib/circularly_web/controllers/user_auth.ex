@@ -3,6 +3,8 @@ defmodule CircularlyWeb.UserAuth do
   import Plug.Conn
   import Phoenix.Controller
 
+  require Logger
+
   alias Circularly.Accounts
   alias CircularlyWeb.Router.Helpers, as: Routes
 
@@ -109,6 +111,22 @@ defmodule CircularlyWeb.UserAuth do
     end
   end
 
+  def fetch_current_organization(
+        %{path_params: %{"permission_slug" => permission_slug}, assigns: %{current_user: user}} =
+          conn,
+        _opts
+      ) do
+    with {:ok, organization: organization, rights: rights} <-
+           Accounts.get_organization_rights_for(user, permission_slug) do
+      conn
+      |> assign(:current_organization, organization)
+      |> assign(:current_rights, rights)
+    else
+      _ ->
+        conn
+    end
+  end
+
   @doc """
   Retrieves current user from user_token and assigns it to the given (liveview) socket as :current_user
   """
@@ -145,6 +163,31 @@ defmodule CircularlyWeb.UserAuth do
       |> put_flash(:error, "You must log in to access this page.")
       |> maybe_store_return_to()
       |> redirect(to: Routes.user_session_path(conn, :new))
+      |> halt()
+    end
+  end
+
+  @doc """
+  Used for routes that require an organization the user is permitted to access (i.e. tenant-specific routes)
+  """
+  def require_authorized_organization(conn, _opts) do
+    if conn.assigns[:current_organization] && conn.assigns[:current_rights] do
+      Logger.debug("organization access authorized",
+        current_user: conn.assigns[:current_user],
+        current_organization: conn.assigns[:current_organization],
+        rights: conn.assigns[:current_rights]
+      )
+
+      conn
+    else
+      Logger.warn("unauthorized organization access",
+        current_user: conn.assigns[:current_user],
+        permission_slug: conn.path_params[:permission_slug]
+      )
+
+      conn
+      |> put_flash(:error, "Organization does not exist or not accessible.")
+      |> redirect(to: Routes.organization_index_path(conn, :index))
       |> halt()
     end
   end

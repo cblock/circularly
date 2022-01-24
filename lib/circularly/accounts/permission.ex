@@ -8,7 +8,8 @@ defmodule Circularly.Accounts.Permission do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "permissions" do
-    field :rights, {:array, Ecto.Enum}, values: [:User, :Admin]
+    field :rights, {:array, Ecto.Enum}, values: [:user, :admin]
+    field :slug, :string
     belongs_to :user, Circularly.Accounts.User
 
     belongs_to :organization, Circularly.Accounts.Organization,
@@ -25,6 +26,6 @@ defmodule Circularly.Accounts.Permission do
     permission
     |> cast(attrs, [:org_id, :user_id])
     |> validate_required([:org_id, :user_id])
-    |> change(rights: [:Admin])
+    |> change(rights: [:admin])
   end
 end

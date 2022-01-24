@@ -105,7 +105,7 @@ defmodule Circularly.AccountsTest do
       assert user.email == email
       assert permission.org_id == organization.org_id
       assert permission.user_id == user.id
-      assert permission.rights == [:Admin]
+      assert permission.rights == [:admin]
     end
   end
 
@@ -570,13 +570,34 @@ defmodule Circularly.AccountsTest do
       assert Accounts.get_organization_for!(user, organization.org_id) == organization
     end
 
-    test "get_organization_for!/2 raises error if for an organization the user has no permission to access" do
+    test "get_organization_for!/2 raises error if the user is not permitted to access the organization" do
       user = user_fixture()
       organization2 = organization_fixture()
 
       assert_raise Ecto.NoResultsError, fn ->
         Accounts.get_organization_for!(user, organization2.org_id)
       end
+    end
+
+    test "get_organization_rights_for/2 returns an organization and the user's rights" do
+      %{organization: organization, user: user, permission: permission} =
+        user_permission_organization_fixture()
+
+      assert Accounts.get_organization_rights_for(user, permission.slug) ==
+               {:ok, organization: organization, rights: permission.rights}
+    end
+
+    test "get_organization_rights_for/2 returns nil if the user is not permitted to access this organization" do
+      %{permission: permission} = user_permission_organization_fixture()
+      other_user = user_fixture()
+
+      assert Accounts.get_organization_rights_for(other_user, permission.slug) == nil
+    end
+
+    test "get_organization_rights_for/2 raises error if permission_slug is nil" do
+      user = user_fixture()
+
+      assert Accounts.get_organization_rights_for(nil, nil) == nil
     end
 
     test "create_organization_for/2 with valid data creates a organization" do
@@ -590,7 +611,7 @@ defmodule Circularly.AccountsTest do
 
       assert Repo.get_by(
                Permission,
-               [user_id: user.id, org_id: organization.org_id, rights: [:Admin]],
+               [user_id: user.id, org_id: organization.org_id, rights: [:admin]],
                skip_org_id: true
              )
     end

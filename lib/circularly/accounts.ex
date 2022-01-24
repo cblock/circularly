@@ -91,7 +91,8 @@ defmodule Circularly.Accounts do
          } ->
         Permission.grant_admin_changeset(%Permission{}, %{user_id: user_id, org_id: org_id})
       end,
-      skip_org_id: true
+      skip_org_id: true,
+      returning: [:slug]
     )
     |> Repo.transaction()
     |> case do
@@ -447,6 +448,39 @@ defmodule Circularly.Accounts do
   end
 
   @doc """
+  Gets a single organization the given user has permission to access as well as the user's permissions for this organization.
+
+  ## Examples
+
+      iex> get_organization_rights_for(current_user, "valid_org_slug")
+      {:ok, organization: %Organization{}, permissions: ["Admin", "User"]}
+
+      iex> get_organization_rights_for(current_user, "invalid_org_slug")
+      nil
+
+      iex> get_organization_rights_for(current_user, nil)
+      nil
+
+  """
+  @spec get_organization_rights_for(%User{}, String.t()) ::
+          {:ok, organization: %Organization{}, rights: []} | nil
+  def get_organization_rights_for(user, permission_slug)
+      when is_nil(user) or is_nil(permission_slug) do
+    nil
+  end
+
+  def get_organization_rights_for(user, permission_slug) do
+    query =
+      from p in Permission,
+        join: o in Organization,
+        on: p.org_id == o.org_id,
+        where: p.slug == ^permission_slug and p.user_id == ^user.id,
+        select: {:ok, organization: o, rights: p.rights}
+
+    Repo.one(query, skip_org_id: true)
+  end
+
+  @doc """
   Creates a organization for a given user and set permission for this user to admin.
 
   ## Examples
@@ -535,7 +569,7 @@ defmodule Circularly.Accounts do
   defp has_admin_rights(user, organization) do
     Repo.get_by(
       Permission,
-      [user_id: user.id, org_id: organization.org_id, rights: [:Admin]],
+      [user_id: user.id, org_id: organization.org_id, rights: [:admin]],
       skip_org_id: true
     )
   end

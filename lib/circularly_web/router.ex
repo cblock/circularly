@@ -13,6 +13,12 @@ defmodule CircularlyWeb.Router do
     plug :fetch_current_user
   end
 
+  pipeline :ensure_tenant do
+    plug :require_authenticated_user
+    plug :fetch_current_organization
+    plug :require_authorized_organization
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -21,10 +27,10 @@ defmodule CircularlyWeb.Router do
     plug :put_root_layout, {CircularlyWeb.LayoutView, :auth_root}
   end
 
+  # Public Access routes
+
   scope "/", CircularlyWeb do
     pipe_through :browser
-
-    get "/", PageController, :index
   end
 
   # Other scopes may use custom stacks.
@@ -54,6 +60,7 @@ defmodule CircularlyWeb.Router do
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
 
+    live "/", OrganizationLive.Index, :index
     live "/organizations", OrganizationLive.Index, :index
     live "/organizations/new", OrganizationLive.Index, :new
     live "/organizations/:id/edit", OrganizationLive.Index, :edit
@@ -91,5 +98,11 @@ defmodule CircularlyWeb.Router do
       live_dashboard "/dashboard", metrics: CircularlyWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  ## Tenant-specific routes
+  scope "/:permission_slug", CircularlyWeb do
+    pipe_through [:browser, :ensure_tenant]
+    get "/", PageController, :index
   end
 end
