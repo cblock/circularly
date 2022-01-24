@@ -89,7 +89,7 @@ defmodule Circularly.Accounts do
            organization: %Organization{org_id: org_id},
            user: %User{id: user_id}
          } ->
-        Permission.grant_admin_changeset(%Permission{}, %{user_id: user_id, org_id: org_id})
+        Permission.grant_owner_changeset(%Permission{}, %{user_id: user_id, org_id: org_id})
       end,
       skip_org_id: true,
       returning: [:slug]
@@ -532,7 +532,7 @@ defmodule Circularly.Accounts do
   @spec update_organization_for(%User{}, %Organization{}, %{}) ::
           {:ok, %Organization{}} | {:error, %Ecto.Changeset{}} | {:error, String.t()}
   def update_organization_for(user, %Organization{} = organization, attrs) do
-    if has_admin_rights(user, organization) do
+    if is_owner(user, organization) do
       organization
       |> Organization.changeset(attrs)
       |> Repo.update(skip_org_id: true)
@@ -559,17 +559,17 @@ defmodule Circularly.Accounts do
   @spec delete_organization_for(%User{}, %Organization{}) ::
           {:ok, %Organization{}} | {:error, %Ecto.Changeset{}} | {:error, String.t()}
   def delete_organization_for(user, %Organization{} = organization) do
-    if has_admin_rights(user, organization) do
+    if is_owner(user, organization) do
       Repo.delete(organization)
     else
       {:error, "Not permitted"}
     end
   end
 
-  defp has_admin_rights(user, organization) do
+  defp is_owner(user, organization) do
     Repo.get_by(
       Permission,
-      [user_id: user.id, org_id: organization.org_id, rights: [:admin]],
+      [user_id: user.id, org_id: organization.org_id, rights: [:owner]],
       skip_org_id: true
     )
   end

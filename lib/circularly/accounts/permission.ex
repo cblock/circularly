@@ -8,7 +8,7 @@ defmodule Circularly.Accounts.Permission do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "permissions" do
-    field :rights, {:array, Ecto.Enum}, values: [:user, :admin]
+    field :rights, {:array, Ecto.Enum}, values: [:user, :admin, :owner]
     field :slug, :string
     belongs_to :user, Circularly.Accounts.User
 
@@ -27,5 +27,15 @@ defmodule Circularly.Accounts.Permission do
     |> cast(attrs, [:org_id, :user_id])
     |> validate_required([:org_id, :user_id])
     |> change(rights: [:admin])
+  end
+
+  @doc """
+  Grants owner role to the given user in the given organization
+  """
+  def grant_owner_changeset(permission, attrs) do
+    permission
+    |> cast(attrs, [:org_id, :user_id])
+    |> validate_required([:org_id, :user_id])
+    |> change(rights: [:owner])
   end
 end

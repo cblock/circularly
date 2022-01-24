@@ -105,7 +105,7 @@ defmodule Circularly.AccountsTest do
       assert user.email == email
       assert permission.org_id == organization.org_id
       assert permission.user_id == user.id
-      assert permission.rights == [:admin]
+      assert permission.rights == [:owner]
     end
   end
 
