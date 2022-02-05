@@ -112,15 +112,17 @@ defmodule CircularlyWeb.UserAuth do
   end
 
   def fetch_current_organization(
-        %{path_params: %{"permission_slug" => permission_slug}, assigns: %{current_user: user}} =
-          conn,
+        %{
+          path_params: %{"org_slug" => org_slug},
+          assigns: %{current_user: user}
+        } = conn,
         _opts
       ) do
-    with {:ok, organization: organization, rights: rights} <-
-           Accounts.get_organization_rights_for(user, permission_slug) do
+    with {:ok, organization: organization, permission: permission} <-
+           Accounts.get_organization_and_permission_for(user, org_slug) do
       conn
       |> assign(:current_organization, organization)
-      |> assign(:current_rights, rights)
+      |> assign(:current_permission, permission)
     else
       _ ->
         conn
@@ -171,18 +173,18 @@ defmodule CircularlyWeb.UserAuth do
   Used for routes that require an organization the user is permitted to access (i.e. tenant-specific routes)
   """
   def require_authorized_organization(conn, _opts) do
-    if conn.assigns[:current_organization] && conn.assigns[:current_rights] do
+    if conn.assigns[:current_organization] && conn.assigns[:current_permission] do
       Logger.debug("organization access authorized",
         current_user: conn.assigns[:current_user],
         current_organization: conn.assigns[:current_organization],
-        rights: conn.assigns[:current_rights]
+        rights: conn.assigns[:current_permission]
       )
 
       conn
     else
       Logger.warn("unauthorized organization access",
         current_user: conn.assigns[:current_user],
-        permission_slug: conn.path_params[:permission_slug]
+        org_slug: conn.path_params[:org_slug]
       )
 
       conn

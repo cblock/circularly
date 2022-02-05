@@ -101,7 +101,7 @@ defmodule CircularlyWeb.Router do
   end
 
   ## Tenant-specific routes
-  scope "/:permission_slug", CircularlyWeb do
+  scope "/:org_slug", CircularlyWeb do
     pipe_through [:browser, :ensure_tenant]
     get "/", PageController, :index
   end

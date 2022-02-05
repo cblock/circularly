@@ -567,7 +567,7 @@ defmodule Circularly.AccountsTest do
 
     test "get_organization_for!/2 returns the organization with given id" do
       %{organization: organization, user: user} = user_permission_organization_fixture()
-      assert Accounts.get_organization_for!(user, organization.org_id) == organization
+      assert Accounts.get_organization_for!(user, organization.slug) == organization
     end
 
     test "get_organization_for!/2 raises error if the user is not permitted to access the organization" do
@@ -579,25 +579,23 @@ defmodule Circularly.AccountsTest do
       end
     end
 
-    test "get_organization_rights_for/2 returns an organization and the user's rights" do
+    test "get_organization_and_permission_for/2 returns an organization and the user's permission" do
       %{organization: organization, user: user, permission: permission} =
         user_permission_organization_fixture()
 
-      assert Accounts.get_organization_rights_for(user, permission.slug) ==
-               {:ok, organization: organization, rights: permission.rights}
+      assert Accounts.get_organization_and_permission_for(user, organization.slug) ==
+               {:ok, organization: organization, permission: permission}
     end
 
-    test "get_organization_rights_for/2 returns nil if the user is not permitted to access this organization" do
-      %{permission: permission} = user_permission_organization_fixture()
+    test "get_organization_and_permission_for/2 returns nil if the user is not permitted to access this organization" do
+      organization = organization_fixture()
       other_user = user_fixture()
 
-      assert Accounts.get_organization_rights_for(other_user, permission.slug) == nil
+      assert Accounts.get_organization_and_permission_for(other_user, organization.slug) == nil
     end
 
-    test "get_organization_rights_for/2 raises error if permission_slug is nil" do
-      user = user_fixture()
-
-      assert Accounts.get_organization_rights_for(nil, nil) == nil
+    test "get_organization_and_permission_for/2 raises error if org_slug is nil" do
+      assert Accounts.get_organization_and_permission_for(nil, nil) == nil
     end
 
     test "create_organization_for/2 with valid data creates a organization" do

@@ -82,7 +82,7 @@ defmodule Circularly.Accounts do
   def register_user(attrs) do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:user, User.registration_changeset(%User{}, attrs), skip_org_id: true)
-    |> Ecto.Multi.insert(:organization, %Organization{}, skip_org_id: true)
+    |> Ecto.Multi.insert(:organization, %Organization{}, skip_org_id: true, returning: [:slug])
     |> Ecto.Multi.insert(
       :permission,
       fn %{
@@ -91,8 +91,7 @@ defmodule Circularly.Accounts do
          } ->
         Permission.grant_owner_changeset(%Permission{}, %{user_id: user_id, org_id: org_id})
       end,
-      skip_org_id: true,
-      returning: [:slug]
+      skip_org_id: true
     )
     |> Repo.transaction()
     |> case do
@@ -437,12 +436,12 @@ defmodule Circularly.Accounts do
 
   """
   @spec get_organization_for!(%User{}, String.t()) :: %Organization{} | Ecto.NoResultsError.t()
-  def get_organization_for!(user, id) do
+  def get_organization_for!(user, org_slug) do
     query =
       from o in Circularly.Accounts.Organization,
         join: p in Circularly.Accounts.Permission,
         on: o.org_id == p.org_id,
-        where: p.user_id == ^user.id and o.org_id == ^id
+        where: p.user_id == ^user.id and o.slug == ^org_slug
 
     Repo.one!(query, skip_org_id: true)
   end
@@ -452,30 +451,30 @@ defmodule Circularly.Accounts do
 
   ## Examples
 
-      iex> get_organization_rights_for(current_user, "valid_org_slug")
-      {:ok, organization: %Organization{}, permissions: ["Admin", "User"]}
+      iex> get_organization_and_permission_for(current_user, "valid_org_slug")
+      {:ok, organization: %Organization{}, permission: %Permission{}}
 
-      iex> get_organization_rights_for(current_user, "invalid_org_slug")
+      iex> get_organization_and_permission_for(current_user, "invalid_org_slug")
       nil
 
-      iex> get_organization_rights_for(current_user, nil)
+      iex> get_organization_and_permission_for(current_user, nil)
       nil
 
   """
-  @spec get_organization_rights_for(%User{}, String.t()) ::
-          {:ok, organization: %Organization{}, rights: []} | nil
-  def get_organization_rights_for(user, permission_slug)
-      when is_nil(user) or is_nil(permission_slug) do
+  @spec get_organization_and_permission_for(%User{}, String.t()) ::
+          {:ok, organization: %Organization{}, permission: %Permission{}} | nil
+  def get_organization_and_permission_for(user, org_slug)
+      when is_nil(user) or is_nil(org_slug) do
     nil
   end
 
-  def get_organization_rights_for(user, permission_slug) do
+  def get_organization_and_permission_for(user, org_slug) do
     query =
       from p in Permission,
         join: o in Organization,
         on: p.org_id == o.org_id,
-        where: p.slug == ^permission_slug and p.user_id == ^user.id,
-        select: {:ok, organization: o, rights: p.rights}
+        where: o.slug == ^org_slug and p.user_id == ^user.id,
+        select: {:ok, organization: o, permission: p}
 
     Repo.one(query, skip_org_id: true)
   end

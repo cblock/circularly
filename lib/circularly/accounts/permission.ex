@@ -9,7 +9,6 @@ defmodule Circularly.Accounts.Permission do
   @foreign_key_type :binary_id
   schema "permissions" do
     field :rights, {:array, Ecto.Enum}, values: [:user, :admin, :owner]
-    field :slug, :string
     belongs_to :user, Circularly.Accounts.User
 
     belongs_to :organization, Circularly.Accounts.Organization,

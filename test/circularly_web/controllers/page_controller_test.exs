@@ -1,6 +1,5 @@
 defmodule CircularlyWeb.PageControllerTest do
   use CircularlyWeb.ConnCase, async: true
-  alias Circularly.Accounts
 
   setup :register_and_log_in_user
 
@@ -11,7 +10,7 @@ defmodule CircularlyWeb.PageControllerTest do
       assert response =~ "<h1>Listing Organizations</h1>"
     end
 
-    test "redirects if user is not logged in", %{conn: conn} do
+    test "redirects if user is not logged in" do
       conn = build_conn()
       conn = get(conn, Routes.organization_index_path(conn, :index))
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)

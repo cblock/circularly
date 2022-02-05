@@ -3,4 +3,5 @@
 </section>
 
 <h2>Current Organization: <%= @current_organization.name %> </h2>
-<h2>Current rights: <%= Enum.join(@current_rights, ", ") %></h2>
+<h2>Current rights: <%= Enum.join(@current_permission.rights, ", ") %></h2>
+<h2>Current Slug: <%= @current_organization.slug %></h2>

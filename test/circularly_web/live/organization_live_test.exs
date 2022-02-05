@@ -14,7 +14,7 @@ defmodule CircularlyWeb.OrganizationLiveTest do
       {:ok, index_live, html} = live(conn, Routes.organization_index_path(conn, :index))
 
       assert html =~ "Listing Organizations"
-      assert has_element?(index_live, "#organization-#{organization.org_id}")
+      assert has_element?(index_live, "#organization-#{organization.slug}")
     end
 
     test "saves new organization", %{conn: conn} do
@@ -44,7 +44,7 @@ defmodule CircularlyWeb.OrganizationLiveTest do
       {:ok, index_live, _html} = live(conn, Routes.organization_index_path(conn, :index))
 
       assert index_live
-             |> element("#organization-#{organization.org_id} a", "Edit")
+             |> element("#organization-#{organization.slug} a", "Edit")
              |> render_click() =~
                "Edit Organization"
 
@@ -69,10 +69,10 @@ defmodule CircularlyWeb.OrganizationLiveTest do
       {:ok, index_live, _html} = live(conn, Routes.organization_index_path(conn, :index))
 
       assert index_live
-             |> element("#organization-#{organization.org_id} a", "Delete")
+             |> element("#organization-#{organization.slug} a", "Delete")
              |> render_click()
 
-      refute has_element?(index_live, "#organization-#{organization.org_id}")
+      refute has_element?(index_live, "#organization-#{organization.slug}")
     end
   end
 
