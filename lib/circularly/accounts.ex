@@ -60,7 +60,7 @@ defmodule Circularly.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_user!(String.t()) :: User.t() | %Ecto.NoResultsError{}
+  @spec get_user!(String.t()) :: User.t() | Exception.t()
   def get_user!(id), do: Repo.get!(User, id, skip_org_id: true)
 
   ## User registration
@@ -438,7 +438,7 @@ defmodule Circularly.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_organization_for!(User.t(), String.t()) :: Organization.t() | %Ecto.NoResultsError{}
+  @spec get_organization_for!(User.t(), String.t()) :: Organization.t() | Exception.t()
   def get_organization_for!(user, org_slug) do
     query =
       from o in Circularly.Accounts.Organization,
