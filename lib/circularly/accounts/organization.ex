@@ -1,4 +1,7 @@
 defmodule Circularly.Accounts.Organization do
+  @moduledoc """
+   Organization entity
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

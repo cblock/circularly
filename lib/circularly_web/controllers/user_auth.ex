@@ -118,12 +118,12 @@ defmodule CircularlyWeb.UserAuth do
         } = conn,
         _opts
       ) do
-    with {:ok, organization: organization, permission: permission} <-
-           Accounts.get_organization_and_permission_for(user, org_slug) do
-      conn
-      |> assign(:current_organization, organization)
-      |> assign(:current_permission, permission)
-    else
+    case Accounts.get_organization_and_permission_for(user, org_slug) do
+      {:ok, organization: organization, permission: permission} ->
+        conn
+        |> assign(:current_organization, organization)
+        |> assign(:current_permission, permission)
+
       _ ->
         conn
     end

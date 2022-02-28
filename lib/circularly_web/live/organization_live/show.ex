@@ -1,4 +1,5 @@
 defmodule CircularlyWeb.OrganizationLive.Show do
+  @moduledoc false
   use CircularlyWeb, :live_view
 
   alias Circularly.Accounts

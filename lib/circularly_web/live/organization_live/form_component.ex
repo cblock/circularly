@@ -1,4 +1,5 @@
 defmodule CircularlyWeb.OrganizationLive.FormComponent do
+  @moduledoc false
   use CircularlyWeb, :live_component
 
   alias Circularly.Accounts
