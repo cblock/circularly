@@ -32,7 +32,6 @@ defmodule Circularly.AccountsFixtures do
     %{organization: organization, user: user, permission: permission}
   end
 
-  @spec user_fixture(any) :: User.t()
   def user_fixture(attrs \\ %{}) do
     %{user: user} = user_permission_organization_fixture(attrs)
     user

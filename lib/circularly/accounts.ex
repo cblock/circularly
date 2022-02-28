@@ -60,7 +60,7 @@ defmodule Circularly.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_user!(String.t()) :: User.t() | Ecto.NoResultsError.t()
+  @spec get_user!(String.t()) :: User.t() | %Ecto.NoResultsError{}
   def get_user!(id), do: Repo.get!(User, id, skip_org_id: true)
 
   ## User registration
@@ -78,7 +78,9 @@ defmodule Circularly.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec register_user(%{}) :: {:error, Ecto.Changeset.t()} | {:ok, User.t()}
+  @spec register_user(%{}) ::
+          {:error, Ecto.Changeset.t()}
+          | {:ok, %{organization: Organization.t(), user: User.t(), permission: Permission.t()}}
   def register_user(attrs) do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:user, User.registration_changeset(%User{}, attrs), skip_org_id: true)
@@ -436,7 +438,7 @@ defmodule Circularly.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_organization_for!(User.t(), String.t()) :: Organization.t() | Ecto.NoResultsError.t()
+  @spec get_organization_for!(User.t(), String.t()) :: Organization.t() | %Ecto.NoResultsError{}
   def get_organization_for!(user, org_slug) do
     query =
       from o in Circularly.Accounts.Organization,
