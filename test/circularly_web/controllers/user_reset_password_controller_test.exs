@@ -27,7 +27,9 @@ defmodule CircularlyWeb.UserResetPasswordControllerTest do
 
       assert redirected_to(conn) == "/"
       assert get_flash(conn, :info) =~ "If your email is in our system"
-      assert Repo.get_by!(Accounts.UserToken, user_id: user.id).context == "reset_password"
+
+      assert Repo.get_by!(Accounts.UserToken, [user_id: user.id], skip_org_id: true).context ==
+               "reset_password"
     end
 
     test "does not send reset password token if email is invalid", %{conn: conn} do
@@ -38,7 +40,7 @@ defmodule CircularlyWeb.UserResetPasswordControllerTest do
 
       assert redirected_to(conn) == "/"
       assert get_flash(conn, :info) =~ "If your email is in our system"
-      assert Repo.all(Accounts.UserToken) == []
+      assert Repo.all(Accounts.UserToken, skip_org_id: true) == []
     end
   end
 

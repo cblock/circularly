@@ -27,11 +27,13 @@ defmodule CircularlyWeb.UserConfirmationControllerTest do
 
       assert redirected_to(conn) == "/"
       assert get_flash(conn, :info) =~ "If your email is in our system"
-      assert Repo.get_by!(Accounts.UserToken, user_id: user.id).context == "confirm"
+
+      assert Repo.get_by!(Accounts.UserToken, [user_id: user.id], skip_org_id: true).context ==
+               "confirm"
     end
 
     test "does not send confirmation token if User is confirmed", %{conn: conn, user: user} do
-      Repo.update!(Accounts.User.confirm_changeset(user))
+      Repo.update!(Accounts.User.confirm_changeset(user), skip_org_id: true)
 
       conn =
         post(conn, Routes.user_confirmation_path(conn, :create), %{
@@ -40,7 +42,7 @@ defmodule CircularlyWeb.UserConfirmationControllerTest do
 
       assert redirected_to(conn) == "/"
       assert get_flash(conn, :info) =~ "If your email is in our system"
-      refute Repo.get_by(Accounts.UserToken, user_id: user.id)
+      refute Repo.get_by(Accounts.UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not send confirmation token if email is invalid", %{conn: conn} do
@@ -51,7 +53,7 @@ defmodule CircularlyWeb.UserConfirmationControllerTest do
 
       assert redirected_to(conn) == "/"
       assert get_flash(conn, :info) =~ "If your email is in our system"
-      assert Repo.all(Accounts.UserToken) == []
+      assert Repo.all(Accounts.UserToken, skip_org_id: true) == []
     end
   end
 
@@ -78,7 +80,7 @@ defmodule CircularlyWeb.UserConfirmationControllerTest do
       assert get_flash(conn, :info) =~ "User confirmed successfully"
       assert Accounts.get_user!(user.id).confirmed_at
       refute get_session(conn, :user_token)
-      assert Repo.all(Accounts.UserToken) == []
+      assert Repo.all(Accounts.UserToken, skip_org_id: true) == []
 
       # When not logged in
       conn = post(conn, Routes.user_confirmation_path(conn, :update, token))

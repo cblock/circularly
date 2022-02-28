@@ -39,7 +39,7 @@ defmodule Circularly.MixProject do
   # Cache dialyzer plt files
   defp dialyzer do
     [
-      plt_add_deps: :transitive,
+      plt_add_deps: :app_tree,
       plt_core_path: "priv/plts",
       plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
     ]
@@ -69,9 +69,10 @@ defmodule Circularly.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
       {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: [:dev, :test], runtime: false},
       {:sobelow, ">= 0.0.0", only: [:dev, :test], runtime: false},
+      {:inch_ex, github: "rrrene/inch_ex", only: [:dev, :test]},
       {:excoveralls, "~> 0.10", only: [:dev, :test]}
     ]
   end

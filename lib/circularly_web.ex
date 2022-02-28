@@ -44,8 +44,8 @@ defmodule CircularlyWeb do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {CircularlyWeb.LayoutView, "live.html"}
+      use Phoenix.LiveView, layout: {CircularlyWeb.LayoutView, "live.html"}
+      import CircularlyWeb.UserAuth, only: [assign_current_user_to_socket: 2]
 
       unquote(view_helpers())
     end
@@ -91,6 +91,7 @@ defmodule CircularlyWeb do
 
       # Import LiveView and .heex helpers (live_render, live_patch, <.form>, etc)
       import Phoenix.LiveView.Helpers
+      import CircularlyWeb.LiveHelpers
 
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View

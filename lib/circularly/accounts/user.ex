@@ -3,14 +3,19 @@ defmodule Circularly.Accounts.User do
 
   use Ecto.Schema
   import Ecto.Changeset
+
+  @type t() :: %__MODULE__{}
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
     field :email, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
-    field :confirmed_at, :naive_datetime
+    field :confirmed_at, :utc_datetime
 
+    has_many :permissions, Circularly.Accounts.Permission
+    has_many :permitted_organizations, through: [:permissions, :organization]
     timestamps()
   end
 
@@ -43,7 +48,7 @@ defmodule Circularly.Accounts.User do
     |> validate_required([:email])
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
-    |> unsafe_validate_unique(:email, Circularly.Repo)
+    |> unsafe_validate_unique(:email, Circularly.Repo, repo_opts: [skip_org_id: true])
     |> unique_constraint(:email)
   end
 
@@ -110,7 +115,7 @@ defmodule Circularly.Accounts.User do
   Confirms the account by setting `confirmed_at`.
   """
   def confirm_changeset(user) do
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
     change(user, confirmed_at: now)
   end
 

@@ -13,6 +13,12 @@ defmodule CircularlyWeb.Router do
     plug :fetch_current_user
   end
 
+  pipeline :ensure_tenant do
+    plug :require_authenticated_user
+    plug :fetch_current_organization
+    plug :require_authorized_organization
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -21,45 +27,16 @@ defmodule CircularlyWeb.Router do
     plug :put_root_layout, {CircularlyWeb.LayoutView, :auth_root}
   end
 
+  # Public Access routes
+
   scope "/", CircularlyWeb do
     pipe_through :browser
-
-    get "/", PageController, :index
   end
 
   # Other scopes may use custom stacks.
   # scope "/api", CircularlyWeb do
   #   pipe_through :api
   # end
-
-  # Enables LiveDashboard only for development
-  #
-  # If you want to use the LiveDashboard in production, you should put
-  # it behind authentication and allow only admins to access it.
-  # If your application does not have an admins-only section yet,
-  # you can use Plug.BasicAuth to set up some basic authentication
-  # as long as you are also using SSL (which you should anyway).
-  if Mix.env() in [:dev, :test] do
-    import Phoenix.LiveDashboard.Router
-
-    scope "/" do
-      pipe_through :browser
-
-      live_dashboard "/dashboard", metrics: CircularlyWeb.Telemetry
-    end
-  end
-
-  # Enables the Swoosh mailbox preview in development.
-  #
-  # Note that preview only shows emails that were sent by the same
-  # node running the Phoenix server.
-  if Mix.env() == :dev do
-    scope "/dev" do
-      pipe_through :browser
-
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
-    end
-  end
 
   ## Authentication routes
 
@@ -82,6 +59,14 @@ defmodule CircularlyWeb.Router do
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+
+    live "/", OrganizationLive.Index, :index
+    live "/organizations", OrganizationLive.Index, :index
+    live "/organizations/new", OrganizationLive.Index, :new
+    live "/organizations/:id/edit", OrganizationLive.Index, :edit
+
+    live "/organizations/:id", OrganizationLive.Show, :show
+    live "/organizations/:id/show/edit", OrganizationLive.Show, :edit
   end
 
   scope "/", CircularlyWeb do
@@ -92,5 +77,32 @@ defmodule CircularlyWeb.Router do
     post "/users/confirm", UserConfirmationController, :create
     get "/users/confirm/:token", UserConfirmationController, :edit
     post "/users/confirm/:token", UserConfirmationController, :update
+  end
+
+  # Enables LiveDashboard and Swoosh mailbox preview in development.
+  #
+  # If you want to use the LiveDashboard in production, you should put
+  # it behind authentication and allow only admins to access it.
+  # If your application does not have an admins-only section yet,
+  # you can use Plug.BasicAuth to set up some basic authentication
+  # as long as you are also using SSL (which you should anyway).
+  #
+  # Note that mailbox preview only shows emails that were sent by the same
+  # node running the Phoenix server.
+  if Mix.env() in [:dev] do
+    import Phoenix.LiveDashboard.Router
+
+    scope "/dev" do
+      pipe_through :browser
+
+      live_dashboard "/dashboard", metrics: CircularlyWeb.Telemetry
+      forward "/mailbox", Plug.Swoosh.MailboxPreview
+    end
+  end
+
+  ## Tenant-specific routes
+  scope "/:org_slug", CircularlyWeb do
+    pipe_through [:browser, :ensure_tenant]
+    get "/", PageController, :index
   end
 end

@@ -89,11 +89,23 @@ defmodule Circularly.AccountsTest do
 
     test "registers users with a hashed password" do
       email = unique_user_email()
-      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
+      {:ok, %{user: user}} = Accounts.register_user(valid_user_attributes(email: email))
       assert user.email == email
       assert is_binary(user.hashed_password)
       assert is_nil(user.confirmed_at)
       assert is_nil(user.password)
+    end
+
+    test "registers user, creates organization and grants admin permission to that organization" do
+      email = unique_user_email()
+
+      {:ok, %{user: user, organization: organization, permission: permission}} =
+        Accounts.register_user(valid_user_attributes(email: email))
+
+      assert user.email == email
+      assert permission.org_id == organization.org_id
+      assert permission.user_id == user.id
+      assert permission.rights == [:owner]
     end
   end
 
@@ -189,7 +201,10 @@ defmodule Circularly.AccountsTest do
         end)
 
       {:ok, token} = Base.url_decode64(token, padding: false)
-      assert user_token = Repo.get_by(UserToken, token: :crypto.hash(:sha256, token))
+
+      assert user_token =
+               Repo.get_by(UserToken, [token: :crypto.hash(:sha256, token)], skip_org_id: true)
+
       assert user_token.user_id == user.id
       assert user_token.sent_to == user.email
       assert user_token.context == "change:current@example.com"
@@ -211,31 +226,35 @@ defmodule Circularly.AccountsTest do
 
     test "updates the email with a valid token", %{user: user, token: token, email: email} do
       assert Accounts.update_user_email(user, token) == :ok
-      changed_user = Repo.get!(User, user.id)
+      changed_user = Repo.get!(User, user.id, skip_org_id: true)
       assert changed_user.email != user.email
       assert changed_user.email == email
       assert changed_user.confirmed_at
       assert changed_user.confirmed_at != user.confirmed_at
-      refute Repo.get_by(UserToken, user_id: user.id)
+      refute Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not update email with invalid token", %{user: user} do
       assert Accounts.update_user_email(user, "oops") == :error
-      assert Repo.get!(User, user.id).email == user.email
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get!(User, user.id, skip_org_id: true).email == user.email
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not update email if user email changed", %{user: user, token: token} do
       assert Accounts.update_user_email(%{user | email: "current@example.com"}, token) == :error
-      assert Repo.get!(User, user.id).email == user.email
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get!(User, user.id, skip_org_id: true).email == user.email
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not update email if token expired", %{user: user, token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+      {1, nil} =
+        Repo.update_all(UserToken, [set: [inserted_at: ~N[2020-01-01 00:00:00]]],
+          skip_org_id: true
+        )
+
       assert Accounts.update_user_email(user, token) == :error
-      assert Repo.get!(User, user.id).email == user.email
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get!(User, user.id, skip_org_id: true).email == user.email
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
   end
 
@@ -312,7 +331,7 @@ defmodule Circularly.AccountsTest do
           password: "New valid password!"
         })
 
-      refute Repo.get_by(UserToken, user_id: user.id)
+      refute Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
   end
 
@@ -323,7 +342,7 @@ defmodule Circularly.AccountsTest do
 
     test "generates a token", %{user: user} do
       token = Accounts.generate_user_session_token(user)
-      assert user_token = Repo.get_by(UserToken, token: token)
+      assert user_token = Repo.get_by(UserToken, [token: token], skip_org_id: true)
       assert user_token.context == "session"
 
       # Creating the same token for another user should fail
@@ -354,7 +373,11 @@ defmodule Circularly.AccountsTest do
     end
 
     test "does not return user for expired token", %{token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+      {1, nil} =
+        Repo.update_all(UserToken, [set: [inserted_at: ~N[2020-01-01 00:00:00]]],
+          skip_org_id: true
+        )
+
       refute Accounts.get_user_by_session_token(token)
     end
   end
@@ -380,7 +403,10 @@ defmodule Circularly.AccountsTest do
         end)
 
       {:ok, token} = Base.url_decode64(token, padding: false)
-      assert user_token = Repo.get_by(UserToken, token: :crypto.hash(:sha256, token))
+
+      assert user_token =
+               Repo.get_by(UserToken, [token: :crypto.hash(:sha256, token)], skip_org_id: true)
+
       assert user_token.user_id == user.id
       assert user_token.sent_to == user.email
       assert user_token.context == "confirm"
@@ -403,21 +429,25 @@ defmodule Circularly.AccountsTest do
       assert {:ok, confirmed_user} = Accounts.confirm_user(token)
       assert confirmed_user.confirmed_at
       assert confirmed_user.confirmed_at != user.confirmed_at
-      assert Repo.get!(User, user.id).confirmed_at
-      refute Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get!(User, user.id, skip_org_id: true).confirmed_at
+      refute Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not confirm with invalid token", %{user: user} do
       assert Accounts.confirm_user("oops") == :error
-      refute Repo.get!(User, user.id).confirmed_at
-      assert Repo.get_by(UserToken, user_id: user.id)
+      refute Repo.get!(User, user.id, skip_org_id: true).confirmed_at
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not confirm email if token expired", %{user: user, token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+      {1, nil} =
+        Repo.update_all(UserToken, [set: [inserted_at: ~N[2020-01-01 00:00:00]]],
+          skip_org_id: true
+        )
+
       assert Accounts.confirm_user(token) == :error
-      refute Repo.get!(User, user.id).confirmed_at
-      assert Repo.get_by(UserToken, user_id: user.id)
+      refute Repo.get!(User, user.id, skip_org_id: true).confirmed_at
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
   end
 
@@ -433,7 +463,10 @@ defmodule Circularly.AccountsTest do
         end)
 
       {:ok, token} = Base.url_decode64(token, padding: false)
-      assert user_token = Repo.get_by(UserToken, token: :crypto.hash(:sha256, token))
+
+      assert user_token =
+               Repo.get_by(UserToken, [token: :crypto.hash(:sha256, token)], skip_org_id: true)
+
       assert user_token.user_id == user.id
       assert user_token.sent_to == user.email
       assert user_token.context == "reset_password"
@@ -454,18 +487,22 @@ defmodule Circularly.AccountsTest do
 
     test "returns the user with valid token", %{user: %{id: id}, token: token} do
       assert %User{id: ^id} = Accounts.get_user_by_reset_password_token(token)
-      assert Repo.get_by(UserToken, user_id: id)
+      assert Repo.get_by(UserToken, [user_id: id], skip_org_id: true)
     end
 
     test "does not return the user with invalid token", %{user: user} do
       refute Accounts.get_user_by_reset_password_token("oops")
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
 
     test "does not return the user if token expired", %{user: user, token: token} do
-      {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+      {1, nil} =
+        Repo.update_all(UserToken, [set: [inserted_at: ~N[2020-01-01 00:00:00]]],
+          skip_org_id: true
+        )
+
       refute Accounts.get_user_by_reset_password_token(token)
-      assert Repo.get_by(UserToken, user_id: user.id)
+      assert Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
   end
 
@@ -505,13 +542,116 @@ defmodule Circularly.AccountsTest do
     test "deletes all tokens for the given user", %{user: user} do
       _ = Accounts.generate_user_session_token(user)
       {:ok, _} = Accounts.reset_user_password(user, %{password: "New valid password!"})
-      refute Repo.get_by(UserToken, user_id: user.id)
+      refute Repo.get_by(UserToken, [user_id: user.id], skip_org_id: true)
     end
   end
 
   describe "inspect/2" do
     test "does not include password" do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
+    end
+  end
+
+  describe "organizations" do
+    alias Circularly.Accounts.{Organization, Permission}
+
+    import Circularly.AccountsFixtures
+
+    # currently no invalid attribtues for organization entity
+    # @invalid_attrs %{name: nil}
+
+    test "list_organizations_for/1 returns all organizations of a user" do
+      %{organization: organization, user: user} = user_permission_organization_fixture()
+      assert Accounts.list_organizations_for(user) == [organization]
+    end
+
+    test "get_organization_for!/2 returns the organization with given id" do
+      %{organization: organization, user: user} = user_permission_organization_fixture()
+      assert Accounts.get_organization_for!(user, organization.slug) == organization
+    end
+
+    test "get_organization_for!/2 raises error if the user is not permitted to access the organization" do
+      user = user_fixture()
+      organization2 = organization_fixture()
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Accounts.get_organization_for!(user, organization2.org_id)
+      end
+    end
+
+    test "get_organization_and_permission_for/2 returns an organization and the user's permission" do
+      %{organization: organization, user: user, permission: permission} =
+        user_permission_organization_fixture()
+
+      assert Accounts.get_organization_and_permission_for(user, organization.slug) ==
+               {:ok, organization: organization, permission: permission}
+    end
+
+    test "get_organization_and_permission_for/2 returns nil if the user is not permitted to access this organization" do
+      organization = organization_fixture()
+      other_user = user_fixture()
+
+      assert Accounts.get_organization_and_permission_for(other_user, organization.slug) == nil
+    end
+
+    test "get_organization_and_permission_for/2 raises error if org_slug is nil" do
+      assert Accounts.get_organization_and_permission_for(nil, nil) == nil
+    end
+
+    test "create_organization_for/2 with valid data creates a organization" do
+      user = user_fixture()
+      valid_attrs = %{name: "some name"}
+
+      assert {:ok, %Organization{} = organization} =
+               Accounts.create_organization_for(user, valid_attrs)
+
+      assert organization.name == "some name"
+
+      assert Repo.get_by(
+               Permission,
+               [user_id: user.id, org_id: organization.org_id, rights: [:admin]],
+               skip_org_id: true
+             )
+    end
+
+    test "update_organization/3 with valid data updates the organization" do
+      %{organization: org, user: user} = user_permission_organization_fixture()
+      update_attrs = %{name: "some updated name"}
+
+      assert {:ok, %Organization{} = organization} =
+               Accounts.update_organization_for(user, org, update_attrs)
+
+      assert organization.name == "some updated name"
+    end
+
+    test "update_organization/3 returns an error if user has no admin permission for that organization" do
+      user = user_fixture()
+      org2 = organization_fixture()
+      update_attrs = %{name: "some updated name"}
+
+      assert {:error, "Not permitted"} =
+               Accounts.update_organization_for(user, org2, update_attrs)
+    end
+
+    test "delete_organization_for/2 deletes the organization" do
+      %{organization: organization, user: user} = user_permission_organization_fixture()
+      assert {:ok, %Organization{}} = Accounts.delete_organization_for(user, organization)
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Accounts.get_organization_for!(user, organization.org_id)
+      end
+    end
+
+    test "delete_organization_for/2 returns an error if user has no admin permission for that organization" do
+      user = user_fixture()
+      org2 = organization_fixture()
+
+      assert {:error, "Not permitted"} = Accounts.delete_organization_for(user, org2)
+    end
+
+    test "change_organization_for/1 returns a organization changeset" do
+      organization = organization_fixture()
+      assert %Ecto.Changeset{} = Accounts.change_organization(organization)
     end
   end
 end
