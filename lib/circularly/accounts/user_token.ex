@@ -3,6 +3,8 @@ defmodule Circularly.Accounts.UserToken do
   use Ecto.Schema
   import Ecto.Query
 
+  @type t() :: %__MODULE__{}
+
   @hash_algorithm :sha256
   @rand_size 32
 
