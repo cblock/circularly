@@ -1,6 +1,6 @@
 defmodule Circularly.Accounts.Permission do
   @moduledoc """
-    Permissions define the rights of a particular user in a particular organization.
+    Permissions define the roles of a particular user in a particular organization.
   """
   use Ecto.Schema
   import Ecto.Changeset
@@ -10,7 +10,7 @@ defmodule Circularly.Accounts.Permission do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "permissions" do
-    field :rights, {:array, Ecto.Enum}, values: [:user, :admin, :owner]
+    field :roles, {:array, Ecto.Enum}, values: [:user, :admin, :owner]
     belongs_to :user, Circularly.Accounts.User
 
     belongs_to :organization, Circularly.Accounts.Organization,
@@ -27,7 +27,7 @@ defmodule Circularly.Accounts.Permission do
     permission
     |> cast(attrs, [:org_id, :user_id])
     |> validate_required([:org_id, :user_id])
-    |> change(rights: [:admin])
+    |> change(roles: [:admin])
   end
 
   @doc """
@@ -37,6 +37,6 @@ defmodule Circularly.Accounts.Permission do
     permission
     |> cast(attrs, [:org_id, :user_id])
     |> validate_required([:org_id, :user_id])
-    |> change(rights: [:owner])
+    |> change(roles: [:owner])
   end
 end

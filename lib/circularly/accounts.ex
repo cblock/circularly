@@ -571,7 +571,7 @@ defmodule Circularly.Accounts do
   defp is_owner(user, organization) do
     Repo.get_by(
       Permission,
-      [user_id: user.id, org_id: organization.org_id, rights: [:owner]],
+      [user_id: user.id, org_id: organization.org_id, roles: [:owner]],
       skip_org_id: true
     )
   end

@@ -105,7 +105,7 @@ defmodule Circularly.AccountsTest do
       assert user.email == email
       assert permission.org_id == organization.org_id
       assert permission.user_id == user.id
-      assert permission.rights == [:owner]
+      assert permission.roles == [:owner]
     end
   end
 
@@ -609,7 +609,7 @@ defmodule Circularly.AccountsTest do
 
       assert Repo.get_by(
                Permission,
-               [user_id: user.id, org_id: organization.org_id, rights: [:admin]],
+               [user_id: user.id, org_id: organization.org_id, roles: [:admin]],
                skip_org_id: true
              )
     end
