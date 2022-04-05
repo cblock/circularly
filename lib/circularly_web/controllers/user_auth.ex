@@ -111,7 +111,13 @@ defmodule CircularlyWeb.UserAuth do
     end
   end
 
-  def fetch_current_organization(
+  @doc """
+  Checks if :current_user has *any* permission for the given organization  and set `:current_permmission` and `:current_organization` accordingly
+  or otherwise halts conn
+
+  Note: Fine grained access control needs to be defined through bodyguard policies in controllers, liveviews, or context modules
+  """
+  def require_organization_and_permission(
         %{
           path_params: %{"org_slug" => org_slug},
           assigns: %{current_user: user}
@@ -126,6 +132,9 @@ defmodule CircularlyWeb.UserAuth do
 
       _ ->
         conn
+        |> put_flash(:error, "Organization does not exist or not accessible.")
+        |> redirect(to: Routes.organization_index_path(conn, :index))
+        |> halt()
     end
   end
 
@@ -165,31 +174,6 @@ defmodule CircularlyWeb.UserAuth do
       |> put_flash(:error, "You must log in to access this page.")
       |> maybe_store_return_to()
       |> redirect(to: Routes.user_session_path(conn, :new))
-      |> halt()
-    end
-  end
-
-  @doc """
-  Used for routes that require an organization the user is permitted to access (i.e. tenant-specific routes)
-  """
-  def require_authorized_organization(conn, _opts) do
-    if conn.assigns[:current_organization] && conn.assigns[:current_permission] do
-      Logger.debug("organization access authorized",
-        current_user: conn.assigns[:current_user],
-        current_organization: conn.assigns[:current_organization],
-        rights: conn.assigns[:current_permission]
-      )
-
-      conn
-    else
-      Logger.warn("unauthorized organization access",
-        current_user: conn.assigns[:current_user],
-        org_slug: conn.path_params[:org_slug]
-      )
-
-      conn
-      |> put_flash(:error, "Organization does not exist or not accessible.")
-      |> redirect(to: Routes.organization_index_path(conn, :index))
       |> halt()
     end
   end

@@ -16,4 +16,26 @@ defmodule CircularlyWeb.PageControllerTest do
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
     end
   end
+
+  describe "GET /:org_slug" do
+    test "renders the org specific start page for an authorized user", %{
+      conn: conn,
+      organization: organization
+    } do
+      conn = get(conn, Routes.page_path(conn, :index, organization.slug))
+      response = html_response(conn, 200)
+      assert response =~ "<h2>Current Organization:"
+    end
+
+    test "redirects user when trying to access an unauthorized organization", %{
+      conn: conn,
+      organization: organization
+    } do
+      second_organization = Circularly.AccountsFixtures.organization_fixture()
+      conn = get(conn, Routes.page_path(conn, :index, second_organization.slug))
+      assert conn.halted
+      assert redirected_to(conn) == Routes.organization_index_path(conn, :index)
+      assert get_flash(conn, :error) == "Organization does not exist or not accessible."
+    end
+  end
 end
