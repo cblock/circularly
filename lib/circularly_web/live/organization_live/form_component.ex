@@ -29,7 +29,7 @@ defmodule CircularlyWeb.OrganizationLive.FormComponent do
   end
 
   defp save_organization(%{assigns: %{current_user: user}} = socket, :edit, organization_params) do
-    case Accounts.update_organization_for(user, socket.assigns.organization, organization_params) do
+    case Accounts.update_user_organization(user, socket.assigns.organization, organization_params) do
       {:ok, _organization} ->
         {:noreply,
          socket
@@ -42,7 +42,7 @@ defmodule CircularlyWeb.OrganizationLive.FormComponent do
   end
 
   defp save_organization(%{assigns: %{current_user: user}} = socket, :new, organization_params) do
-    case Accounts.create_organization_for(user, organization_params) do
+    case Accounts.create_user_organization(user, organization_params) do
       {:ok, _organization} ->
         {:noreply,
          socket

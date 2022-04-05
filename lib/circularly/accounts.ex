@@ -409,12 +409,12 @@ defmodule Circularly.Accounts do
 
   ## Examples
 
-      iex> list_organizations_for(current_user)
+      iex> list_user_organizations(current_user)
       [%Organization{}, ...]
 
   """
-  @spec list_organizations_for(User.t()) :: [Organization.t()]
-  def list_organizations_for(user) do
+  @spec list_user_organizations(User.t()) :: [Organization.t()]
+  def list_user_organizations(user) do
     query =
       from o in Circularly.Accounts.Organization,
         join: p in Circularly.Accounts.Permission,
@@ -431,15 +431,15 @@ defmodule Circularly.Accounts do
 
   ## Examples
 
-      iex> get_organization_for!(current_user, "11111111-dead-beef-1111-111111111111")
+      iex> get_user_organization!(current_user, "11111111-dead-beef-1111-111111111111")
       %Organization{}
 
-      iex> get_organization_for!(current_user, "11111111-dead-beef-1111-000000000000")
+      iex> get_user_organization!(current_user, "11111111-dead-beef-1111-000000000000")
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_organization_for!(User.t(), String.t()) :: Organization.t() | Exception.t()
-  def get_organization_for!(user, org_slug) do
+  @spec get_user_organization!(User.t(), String.t()) :: Organization.t() | Exception.t()
+  def get_user_organization!(user, org_slug) do
     query =
       from o in Circularly.Accounts.Organization,
         join: p in Circularly.Accounts.Permission,
@@ -454,24 +454,24 @@ defmodule Circularly.Accounts do
 
   ## Examples
 
-      iex> get_organization_and_permission_for(current_user, "valid_org_slug")
+      iex> get_user_organization_and_permission(current_user, "valid_org_slug")
       {:ok, organization: %Organization{}, permission: %Permission{}}
 
-      iex> get_organization_and_permission_for(current_user, "invalid_org_slug")
+      iex> get_user_organization_and_permission(current_user, "invalid_org_slug")
       nil
 
-      iex> get_organization_and_permission_for(current_user, nil)
+      iex> get_user_organization_and_permission(current_user, nil)
       nil
 
   """
-  @spec get_organization_and_permission_for(User.t(), String.t()) ::
+  @spec get_user_organization_and_permission(User.t(), String.t()) ::
           {:ok, organization: Organization.t(), permission: Permission.t()} | nil
-  def get_organization_and_permission_for(user, org_slug)
+  def get_user_organization_and_permission(user, org_slug)
       when is_nil(user) or is_nil(org_slug) do
     nil
   end
 
-  def get_organization_and_permission_for(user, org_slug) do
+  def get_user_organization_and_permission(user, org_slug) do
     query =
       from p in Permission,
         join: o in Organization,
@@ -487,16 +487,16 @@ defmodule Circularly.Accounts do
 
   ## Examples
 
-      iex> create_organization_for(current_user, %{field: value})
+      iex> create_user_organization(current_user, %{field: value})
       {:ok, %Organization{}}
 
-      iex> create_organization_for(current_user, %{field: bad_value})
+      iex> create_user_organization(current_user, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_organization_for(User.t(), %{}) ::
+  @spec create_user_organization(User.t(), %{}) ::
           {:error, Ecto.Changeset.t()} | {:ok, Organization.t()}
-  def create_organization_for(user, attrs \\ %{}) do
+  def create_user_organization(user, attrs \\ %{}) do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:organization, Organization.changeset(%Organization{}, attrs))
     |> Ecto.Multi.insert(
@@ -521,19 +521,19 @@ defmodule Circularly.Accounts do
 
   ## Examples
 
-      iex> update_organization_for(current_user, organization, %{field: new_value})
+      iex> update_user_organization(current_user, organization, %{field: new_value})
       {:ok, %Organization{}}
 
-      iex> update_organization_for(current_user, other_organization, %{field: new_value})
+      iex> update_user_organization(current_user, other_organization, %{field: new_value})
       {:error, "Not permitted"}
 
-      iex> update_organization_for(current_user, organization, %{field: bad_value})
+      iex> update_user_organization(current_user, organization, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_organization_for(User.t(), Organization.t(), %{}) ::
+  @spec update_user_organization(User.t(), Organization.t(), %{}) ::
           {:ok, Organization.t()} | {:error, Ecto.Changeset.t()} | {:error, String.t()}
-  def update_organization_for(user, %Organization{} = organization, attrs) do
+  def update_user_organization(user, %Organization{} = organization, attrs) do
     if is_owner(user, organization) do
       organization
       |> Organization.changeset(attrs)
@@ -548,19 +548,19 @@ defmodule Circularly.Accounts do
 
   ## Examples
 
-      iex> delete_organization_for(user, organization)
+      iex> delete_user_organization(user, organization)
       {:ok, %Organization{}}
 
-      iex> delete_organization_for(user, organization)
+      iex> delete_user_organization(user, organization)
       {:error, %Ecto.Changeset{}}
 
-      iex> delete_organization_for(user, other_organization)
+      iex> delete_user_organization(user, other_organization)
       {:error, "Not permitted"}
 
   """
-  @spec delete_organization_for(User.t(), Organization.t()) ::
+  @spec delete_user_organization(User.t(), Organization.t()) ::
           {:ok, Organization.t()} | {:error, Ecto.Changeset.t()} | {:error, String.t()}
-  def delete_organization_for(user, %Organization{} = organization) do
+  def delete_user_organization(user, %Organization{} = organization) do
     if is_owner(user, organization) do
       Repo.delete(organization)
     else

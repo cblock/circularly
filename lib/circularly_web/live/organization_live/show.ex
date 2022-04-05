@@ -17,7 +17,7 @@ defmodule CircularlyWeb.OrganizationLive.Show do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:organization, Accounts.get_organization_for!(user, id))}
+     |> assign(:organization, Accounts.get_user_organization!(user, id))}
   end
 
   defp page_title(:show), do: "Show Organization"

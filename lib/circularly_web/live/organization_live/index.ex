@@ -22,7 +22,7 @@ defmodule CircularlyWeb.OrganizationLive.Index do
   defp apply_action(%{assigns: %{current_user: user}} = socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Organization")
-    |> assign(:organization, Accounts.get_organization_for!(user, id))
+    |> assign(:organization, Accounts.get_user_organization!(user, id))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -39,15 +39,15 @@ defmodule CircularlyWeb.OrganizationLive.Index do
 
   @impl true
   def handle_event("delete", %{"slug" => slug}, %{assigns: %{current_user: user}} = socket) do
-    organization = Accounts.get_organization_for!(user, slug)
-    {:ok, _} = Accounts.delete_organization_for(user, organization)
+    organization = Accounts.get_user_organization!(user, slug)
+    {:ok, _} = Accounts.delete_user_organization(user, organization)
 
-    {:noreply, assign(socket, :organizations, Accounts.list_organizations_for(user))}
+    {:noreply, assign(socket, :organizations, Accounts.list_user_organizations(user))}
   end
 
   defp assign_organizations(socket) do
     user = socket.assigns.current_user
-    organizations = Accounts.list_organizations_for(user)
+    organizations = Accounts.list_user_organizations(user)
     assign(socket, :organizations, organizations)
   end
 end
