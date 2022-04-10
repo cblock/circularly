@@ -654,7 +654,7 @@ defmodule Circularly.AccountsTest do
       assert {:error, "Not permitted"} = Accounts.delete_user_organization(user, org.slug)
     end
 
-    test "change_organization_for/1 returns a organization changeset" do
+    test "change_organization/1 returns a organization changeset" do
       organization = organization_fixture()
       assert %Ecto.Changeset{} = Accounts.change_organization(organization)
     end
