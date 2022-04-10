@@ -30,24 +30,4 @@ defmodule Circularly.Accounts.UserOrgMembership do
     |> validate_required([:org_id, :user_id])
     |> change(roles: [Roles.admin()])
   end
-
-  @doc """
-  Grants viewer role to the given user in the given organization
-  """
-  def grant_viewer_changeset(user_org_membership, attrs) do
-    user_org_membership
-    |> cast(attrs, [:org_id, :user_id])
-    |> validate_required([:org_id, :user_id])
-    |> change(roles: [Roles.viewer()])
-  end
-
-  @doc """
-  Grants editor role to the given user in the given organization
-  """
-  def grant_editor_changeset(user_org_membership, attrs) do
-    user_org_membership
-    |> cast(attrs, [:org_id, :user_id])
-    |> validate_required([:org_id, :user_id])
-    |> change(roles: [Roles.editor()])
-  end
 end
