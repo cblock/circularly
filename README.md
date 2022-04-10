@@ -1,6 +1,7 @@
 # Circularly
 
 [![Crowdin](https://badges.crowdin.net/circularly/localized.svg)](https://crowdin.com)
+[![Coverage Status](https://coveralls.io/repos/github/cblock/circularly/badge.svg)](https://coveralls.io/github/cblock/circularly)
 
 To start your Phoenix server:
 
