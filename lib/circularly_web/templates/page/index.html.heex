@@ -2,6 +2,5 @@
   <h1><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h1>
 </section>
 
-<h2>Current Organization: <%= @current_organization.name %> </h2>
-<h2>Current roles: <%= Enum.join(@current_permission.roles, ", ") %></h2>
-<h2>Current Slug: <%= @current_organization.slug %></h2>
+<h2>Current Organization: <%= @current_user_org_membership.organization.name %> </h2>
+<h2>Current roles: <%= Enum.join(@current_user_org_membership.roles, ", ") %></h2>

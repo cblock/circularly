@@ -38,9 +38,12 @@ defmodule CircularlyWeb.OrganizationLive.Index do
   end
 
   @impl true
-  def handle_event("delete", %{"slug" => slug}, %{assigns: %{current_user: user}} = socket) do
-    organization = Accounts.get_user_organization!(user, slug)
-    {:ok, _} = Accounts.delete_user_organization(user, organization)
+  def handle_event(
+        "delete",
+        %{"slug" => organization_slug},
+        %{assigns: %{current_user: user}} = socket
+      ) do
+    {:ok, _} = Accounts.delete_user_organization(user, organization_slug)
 
     {:noreply, assign(socket, :organizations, Accounts.list_user_organizations(user))}
   end

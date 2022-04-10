@@ -112,23 +112,17 @@ defmodule CircularlyWeb.UserAuth do
   end
 
   @doc """
-  Checks if :current_user has *any* permission for the given organization  and set `:current_permmission` and `:current_organization` accordingly
-  or otherwise halts conn
-
-  Note: Fine grained access control needs to be defined through bodyguard policies in controllers, liveviews, or context modules
+  Checks if :current_user has a user_org_membership for the given organization and set `:current_user_org_membership` accordingly
+  otherwise conn will be halted
   """
-  def require_organization_and_permission(
-        %{
-          path_params: %{"org_slug" => org_slug},
-          assigns: %{current_user: user}
-        } = conn,
+  def require_user_org_membership(
+        %{path_params: %{"org_slug" => org_slug}, assigns: %{current_user: user}} = conn,
         _opts
       ) do
-    case Accounts.get_user_organization_and_permission(user, org_slug) do
-      {:ok, organization: organization, permission: permission} ->
+    case Accounts.get_user_org_membership(user, org_slug) do
+      {:ok, user_org_membership} ->
         conn
-        |> assign(:current_organization, organization)
-        |> assign(:current_permission, permission)
+        |> assign(:current_user_org_membership, user_org_membership)
 
       _ ->
         conn
