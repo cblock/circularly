@@ -47,7 +47,7 @@ defmodule CircularlyWeb.ConnCase do
   """
   def register_and_log_in_user(%{conn: conn}) do
     %{user: user, organization: organization} =
-      Circularly.AccountsFixtures.user_permission_organization_fixture()
+      Circularly.AccountsFixtures.user_org_membership_organization_fixture()
 
     %{conn: log_in_user(conn, user), user: user, organization: organization}
   end

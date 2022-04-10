@@ -14,8 +14,8 @@ defmodule Circularly.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
 
-    has_many :permissions, Circularly.Accounts.Permission
-    has_many :permitted_organizations, through: [:permissions, :organization]
+    has_many :user_org_memberships, Circularly.Accounts.UserOrgMembership
+    has_many :permitted_organizations, through: [:user_org_memberships, :organization]
     timestamps()
   end
 

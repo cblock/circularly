@@ -4,9 +4,10 @@ defmodule Circularly.Accounts do
   """
 
   import Ecto.Query, warn: false
-  alias Circularly.Repo
+  alias Circularly.{Repo, Accounts}
+  alias Circularly.Accounts.{Organization, User, UserOrgMembership, UserToken, UserNotifier}
 
-  alias Circularly.Accounts.{Organization, User, Permission, UserToken, UserNotifier}
+  defdelegate authorize(action, user, params), to: Circularly.Accounts.Organization.Policy
 
   ## Database getters
 
@@ -66,7 +67,7 @@ defmodule Circularly.Accounts do
   ## User registration
 
   @doc """
-  Registers a user, creates a corresponding organization and creates a permissions record
+  Registers a user, creates a corresponding organization and creates a user_org_membership record
   that makes the created user admin in created oranization.
 
   ## Examples
@@ -80,18 +81,23 @@ defmodule Circularly.Accounts do
   """
   @spec register_user(%{}) ::
           {:error, Ecto.Changeset.t()}
-          | {:ok, %{organization: Organization.t(), user: User.t(), permission: Permission.t()}}
+          | {:ok,
+             %{
+               organization: Organization.t(),
+               user: User.t(),
+               user_org_membership: UserOrgMembership.t()
+             }}
   def register_user(attrs) do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:user, User.registration_changeset(%User{}, attrs), skip_org_id: true)
     |> Ecto.Multi.insert(:organization, %Organization{}, skip_org_id: true, returning: [:slug])
     |> Ecto.Multi.insert(
-      :permission,
-      fn %{
-           organization: %Organization{org_id: org_id},
-           user: %User{id: user_id}
-         } ->
-        Permission.grant_owner_changeset(%Permission{}, %{user_id: user_id, org_id: org_id})
+      :user_org_membership,
+      fn %{organization: organization, user: %User{id: user_id}} ->
+        UserOrgMembership.grant_admin_changeset(%UserOrgMembership{}, %{
+          user_id: user_id,
+          org_id: organization.org_id
+        })
       end,
       skip_org_id: true
     )
@@ -409,100 +415,106 @@ defmodule Circularly.Accounts do
 
   ## Examples
 
-      iex> list_organizations_for(current_user)
+      iex> list_user_organizations(current_user)
       [%Organization{}, ...]
 
   """
-  @spec list_organizations_for(User.t()) :: [Organization.t()]
-  def list_organizations_for(user) do
+  @spec list_user_organizations(User.t()) :: [Organization.t()]
+  def list_user_organizations(user) do
     query =
-      from o in Circularly.Accounts.Organization,
-        join: p in Circularly.Accounts.Permission,
+      from(o in Circularly.Accounts.Organization,
+        join: p in Circularly.Accounts.UserOrgMembership,
         on: o.org_id == p.org_id,
         where: p.user_id == ^user.id
+      )
 
     Repo.all(query, skip_org_id: true)
   end
 
   @doc """
-  Gets a single organization the given user has permission to access.
+  Gets a single organization the given user has user_org_membership to access.
 
   Raises `Ecto.NoResultsError` if the Organization does not exist.
 
   ## Examples
 
-      iex> get_organization_for!(current_user, "11111111-dead-beef-1111-111111111111")
+      iex> get_user_organization!(current_user, "11111111-dead-beef-1111-111111111111")
       %Organization{}
 
-      iex> get_organization_for!(current_user, "11111111-dead-beef-1111-000000000000")
+      iex> get_user_organization!(current_user, "11111111-dead-beef-1111-000000000000")
       ** (Ecto.NoResultsError)
 
   """
-  @spec get_organization_for!(User.t(), String.t()) :: Organization.t() | Exception.t()
-  def get_organization_for!(user, org_slug) do
+  @spec get_user_organization!(User.t(), String.t()) :: Organization.t() | Exception.t()
+  def get_user_organization!(user, org_slug) do
     query =
-      from o in Circularly.Accounts.Organization,
-        join: p in Circularly.Accounts.Permission,
+      from(o in Circularly.Accounts.Organization,
+        join: p in Circularly.Accounts.UserOrgMembership,
         on: o.org_id == p.org_id,
         where: p.user_id == ^user.id and o.slug == ^org_slug
+      )
 
     Repo.one!(query, skip_org_id: true)
   end
 
   @doc """
-  Gets a single organization the given user has permission to access as well as the user's permissions for this organization.
+  Gets a users' user_org_membership for the organization defined by org_slug.
 
   ## Examples
 
-      iex> get_organization_and_permission_for(current_user, "valid_org_slug")
-      {:ok, organization: %Organization{}, permission: %Permission{}}
+      iex> get_user_org_membership(current_user, "valid_org_slug")
+      {:ok, %UserOrgMembership{}}
 
-      iex> get_organization_and_permission_for(current_user, "invalid_org_slug")
+      iex> get_user_org_membership(current_user, "invalid_org_slug")
       nil
 
-      iex> get_organization_and_permission_for(current_user, nil)
+      iex> get_user_org_membership(current_user, nil)
       nil
 
   """
-  @spec get_organization_and_permission_for(User.t(), String.t()) ::
-          {:ok, organization: Organization.t(), permission: Permission.t()} | nil
-  def get_organization_and_permission_for(user, org_slug)
+  @spec get_user_org_membership(User.t(), String.t()) :: {:ok, UserOrgMembership.t()} | nil
+  def get_user_org_membership(user, org_slug)
       when is_nil(user) or is_nil(org_slug) do
     nil
   end
 
-  def get_organization_and_permission_for(user, org_slug) do
+  def get_user_org_membership(user, org_slug) do
     query =
-      from p in Permission,
+      from(p in UserOrgMembership,
         join: o in Organization,
         on: p.org_id == o.org_id,
         where: o.slug == ^org_slug and p.user_id == ^user.id,
-        select: {:ok, organization: o, permission: p}
+        preload: [organization: o],
+        select: {:ok, p}
+      )
 
     Repo.one(query, skip_org_id: true)
   end
 
   @doc """
-  Creates a organization for a given user and set permission for this user to admin.
+  Creates a organization for a given user and set user_org_membership for this user to admin.
 
   ## Examples
 
-      iex> create_organization_for(current_user, %{field: value})
+      iex> create_user_organization(current_user, %{field: value})
       {:ok, %Organization{}}
 
-      iex> create_organization_for(current_user, %{field: bad_value})
+      iex> create_user_organization(current_user, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_organization_for(User.t(), %{}) ::
+  @spec create_user_organization(User.t(), %{}) ::
           {:error, Ecto.Changeset.t()} | {:ok, Organization.t()}
-  def create_organization_for(user, attrs \\ %{}) do
+  def create_user_organization(user, attrs \\ %{}) do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:organization, Organization.changeset(%Organization{}, attrs))
     |> Ecto.Multi.insert(
-      :permission,
+      :user_org_membership,
       fn %{organization: %Organization{org_id: org_id}} ->
-        Permission.grant_admin_changeset(%Permission{}, %{user_id: user.id, org_id: org_id})
+        UserOrgMembership.grant_admin_changeset(%UserOrgMembership{}, %{
+          user_id: user.id,
+          org_id: org_id
+        })
       end,
       skip_org_id: true
     )
@@ -521,59 +533,55 @@ defmodule Circularly.Accounts do
 
   ## Examples
 
-      iex> update_organization_for(current_user, organization, %{field: new_value})
+      iex> update_user_organization(current_user, organization, %{field: new_value})
       {:ok, %Organization{}}
 
-      iex> update_organization_for(current_user, other_organization, %{field: new_value})
+      iex> update_user_organization(current_user, organization, %{field: new_value})
       {:error, "Not permitted"}
 
-      iex> update_organization_for(current_user, organization, %{field: bad_value})
+      iex> update_user_organization(current_user, organization, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec update_organization_for(User.t(), Organization.t(), %{}) ::
+  @spec update_user_organization(User.t(), Organization.t(), %{}) ::
           {:ok, Organization.t()} | {:error, Ecto.Changeset.t()} | {:error, String.t()}
-  def update_organization_for(user, %Organization{} = organization, attrs) do
-    if is_owner(user, organization) do
+  def update_user_organization(%User{} = user, %Organization{} = organization, attrs) do
+    with {:ok, user_org_membership} <- Accounts.get_user_org_membership(user, organization.slug),
+         :ok <- Bodyguard.permit(Accounts, :update_organization, user, user_org_membership) do
       organization
       |> Organization.changeset(attrs)
       |> Repo.update(skip_org_id: true)
     else
-      {:error, "Not permitted"}
+      _ ->
+        {:error, "Not permitted"}
     end
   end
 
   @doc """
-  Deletes an organization if the given user has admin privileges..
+  Deletes an organization if the given user has the necessary permission in the given user_org_membership.
 
   ## Examples
 
-      iex> delete_organization_for(user, organization)
+      iex> delete_user_organization(user, org_slug)
       {:ok, %Organization{}}
 
-      iex> delete_organization_for(user, organization)
+      iex> delete_user_organization(user, invalid_org_slug)
       {:error, %Ecto.Changeset{}}
 
-      iex> delete_organization_for(user, other_organization)
+      iex> delete_user_organization(user, org_slug_of_different_organizatiob)
       {:error, "Not permitted"}
 
   """
-  @spec delete_organization_for(User.t(), Organization.t()) ::
+  @spec delete_user_organization(User.t(), String.t()) ::
           {:ok, Organization.t()} | {:error, Ecto.Changeset.t()} | {:error, String.t()}
-  def delete_organization_for(user, %Organization{} = organization) do
-    if is_owner(user, organization) do
-      Repo.delete(organization)
+  def delete_user_organization(user, organization_slug) do
+    with {:ok, user_org_membership} <- Accounts.get_user_org_membership(user, organization_slug),
+         :ok <- Bodyguard.permit(Accounts, :delete_organization, user, user_org_membership) do
+      Repo.delete(%Organization{org_id: user_org_membership.org_id}, skip_org_id: true)
     else
-      {:error, "Not permitted"}
+      _ ->
+        {:error, "Not permitted"}
     end
-  end
-
-  defp is_owner(user, organization) do
-    Repo.get_by(
-      Permission,
-      [user_id: user.id, org_id: organization.org_id, rights: [:owner]],
-      skip_org_id: true
-    )
   end
 
   @doc """

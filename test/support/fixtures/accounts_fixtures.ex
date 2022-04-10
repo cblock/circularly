@@ -21,19 +21,19 @@ defmodule Circularly.AccountsFixtures do
   end
 
   @doc """
-  Generate a user, an organization and an admin permission for the user in the organization.
+  Generate a user, an organization and an admin user_org_membership for the user in the organization.
   """
-  def user_permission_organization_fixture(attrs \\ %{}) do
-    {:ok, %{organization: organization, user: user, permission: permission}} =
+  def user_org_membership_organization_fixture(attrs \\ %{}) do
+    {:ok, %{organization: organization, user: user, user_org_membership: user_org_membership}} =
       attrs
       |> valid_user_attributes()
       |> Circularly.Accounts.register_user()
 
-    %{organization: organization, user: user, permission: permission}
+    %{organization: organization, user: user, user_org_membership: user_org_membership}
   end
 
   def user_fixture(attrs \\ %{}) do
-    %{user: user} = user_permission_organization_fixture(attrs)
+    %{user: user} = user_org_membership_organization_fixture(attrs)
     user
   end
 
@@ -41,7 +41,15 @@ defmodule Circularly.AccountsFixtures do
   Generate a organization.
   """
   def organization_fixture(attrs \\ %{}) do
-    %{organization: organization} = user_permission_organization_fixture(attrs)
+    %{organization: organization} = user_org_membership_organization_fixture(attrs)
     organization
+  end
+
+  @doc """
+  Generate a user_org_membership.
+  """
+  def user_org_membership_fixture(attrs \\ %{}) do
+    %{user_org_membership: user_org_membership} = user_org_membership_organization_fixture(attrs)
+    user_org_membership
   end
 end

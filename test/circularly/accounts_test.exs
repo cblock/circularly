@@ -4,7 +4,7 @@ defmodule Circularly.AccountsTest do
   alias Circularly.Accounts
 
   import Circularly.AccountsFixtures
-  alias Circularly.Accounts.{User, UserToken}
+  alias Circularly.Accounts.{User, UserToken, Roles}
 
   describe "get_user_by_email/1" do
     test "does not return the user if the email does not exist" do
@@ -96,16 +96,16 @@ defmodule Circularly.AccountsTest do
       assert is_nil(user.password)
     end
 
-    test "registers user, creates organization and grants admin permission to that organization" do
+    test "registers user, creates organization and grants admin user_org_membership to that organization" do
       email = unique_user_email()
 
-      {:ok, %{user: user, organization: organization, permission: permission}} =
+      {:ok, %{user: user, organization: organization, user_org_membership: user_org_membership}} =
         Accounts.register_user(valid_user_attributes(email: email))
 
       assert user.email == email
-      assert permission.org_id == organization.org_id
-      assert permission.user_id == user.id
-      assert permission.rights == [:owner]
+      assert user_org_membership.org_id == organization.org_id
+      assert user_org_membership.user_id == user.id
+      assert user_org_membership.roles == [Roles.admin()]
     end
   end
 
@@ -553,100 +553,105 @@ defmodule Circularly.AccountsTest do
   end
 
   describe "organizations" do
-    alias Circularly.Accounts.{Organization, Permission}
+    alias Circularly.Accounts.{Organization, UserOrgMembership}
 
     import Circularly.AccountsFixtures
 
     # currently no invalid attribtues for organization entity
     # @invalid_attrs %{name: nil}
 
-    test "list_organizations_for/1 returns all organizations of a user" do
-      %{organization: organization, user: user} = user_permission_organization_fixture()
-      assert Accounts.list_organizations_for(user) == [organization]
+    test "list_user_organizations/1 returns all organizations of a user" do
+      %{organization: organization, user: user} = user_org_membership_organization_fixture()
+      assert Accounts.list_user_organizations(user) == [organization]
     end
 
-    test "get_organization_for!/2 returns the organization with given id" do
-      %{organization: organization, user: user} = user_permission_organization_fixture()
-      assert Accounts.get_organization_for!(user, organization.slug) == organization
+    test "get_user_organization!/2 returns the organization with given id" do
+      %{organization: organization, user: user} = user_org_membership_organization_fixture()
+      assert Accounts.get_user_organization!(user, organization.slug) == organization
     end
 
-    test "get_organization_for!/2 raises error if the user is not permitted to access the organization" do
+    test "get_user_organization!/2 raises error if the user is not permitted to access the organization" do
       user = user_fixture()
       organization2 = organization_fixture()
 
       assert_raise Ecto.NoResultsError, fn ->
-        Accounts.get_organization_for!(user, organization2.org_id)
+        Accounts.get_user_organization!(user, organization2.org_id)
       end
     end
 
-    test "get_organization_and_permission_for/2 returns an organization and the user's permission" do
-      %{organization: organization, user: user, permission: permission} =
-        user_permission_organization_fixture()
+    test "get_user_org_membership/2 returns the user's user_org_membership with organization pre-loaded" do
+      %{organization: organization, user: user, user_org_membership: user_org_membership} =
+        user_org_membership_organization_fixture()
 
-      assert Accounts.get_organization_and_permission_for(user, organization.slug) ==
-               {:ok, organization: organization, permission: permission}
+      {:ok, resulting_user_org_membership} =
+        Accounts.get_user_org_membership(user, organization.slug)
+
+      assert user_org_membership.id == resulting_user_org_membership.id
+      assert resulting_user_org_membership.organization.slug == organization.slug
     end
 
-    test "get_organization_and_permission_for/2 returns nil if the user is not permitted to access this organization" do
+    test "get_user_org_membership/2 returns nil if the user is not permitted to access this organization" do
       organization = organization_fixture()
       other_user = user_fixture()
 
-      assert Accounts.get_organization_and_permission_for(other_user, organization.slug) == nil
+      assert Accounts.get_user_org_membership(other_user, organization.slug) == nil
     end
 
-    test "get_organization_and_permission_for/2 raises error if org_slug is nil" do
-      assert Accounts.get_organization_and_permission_for(nil, nil) == nil
+    test "get_user_org_membership/2 raises error if org_slug is nil" do
+      assert Accounts.get_user_org_membership(nil, nil) == nil
     end
 
-    test "create_organization_for/2 with valid data creates a organization" do
+    test "create_user_organization/2 with valid data creates a organization" do
       user = user_fixture()
       valid_attrs = %{name: "some name"}
 
       assert {:ok, %Organization{} = organization} =
-               Accounts.create_organization_for(user, valid_attrs)
+               Accounts.create_user_organization(user, valid_attrs)
 
       assert organization.name == "some name"
 
       assert Repo.get_by(
-               Permission,
-               [user_id: user.id, org_id: organization.org_id, rights: [:admin]],
+               UserOrgMembership,
+               [user_id: user.id, org_id: organization.org_id, roles: [Roles.admin()]],
                skip_org_id: true
              )
     end
 
     test "update_organization/3 with valid data updates the organization" do
-      %{organization: org, user: user} = user_permission_organization_fixture()
+      %{organization: org, user: user} = user_org_membership_organization_fixture()
       update_attrs = %{name: "some updated name"}
 
       assert {:ok, %Organization{} = organization} =
-               Accounts.update_organization_for(user, org, update_attrs)
+               Accounts.update_user_organization(user, org, update_attrs)
 
       assert organization.name == "some updated name"
     end
 
-    test "update_organization/3 returns an error if user has no admin permission for that organization" do
+    test "update_organization/3 returns an error if user has no admin role in user_org_membership for that organization" do
       user = user_fixture()
       org2 = organization_fixture()
       update_attrs = %{name: "some updated name"}
 
       assert {:error, "Not permitted"} =
-               Accounts.update_organization_for(user, org2, update_attrs)
+               Accounts.update_user_organization(user, org2, update_attrs)
     end
 
-    test "delete_organization_for/2 deletes the organization" do
-      %{organization: organization, user: user} = user_permission_organization_fixture()
-      assert {:ok, %Organization{}} = Accounts.delete_organization_for(user, organization)
+    test "delete_user_organization/2 deletes the organization" do
+      %{user_org_membership: user_org_membership, organization: organization, user: user} =
+        user_org_membership_organization_fixture()
+
+      assert {:ok, %Organization{}} = Accounts.delete_user_organization(user, organization.slug)
 
       assert_raise Ecto.NoResultsError, fn ->
-        Accounts.get_organization_for!(user, organization.org_id)
+        Accounts.get_user_organization!(user, user_org_membership.org_id)
       end
     end
 
-    test "delete_organization_for/2 returns an error if user has no admin permission for that organization" do
+    test "delete_user_organization/2 returns an error if user has no admin user_org_membership for that organization" do
       user = user_fixture()
-      org2 = organization_fixture()
+      org = organization_fixture()
 
-      assert {:error, "Not permitted"} = Accounts.delete_organization_for(user, org2)
+      assert {:error, "Not permitted"} = Accounts.delete_user_organization(user, org.slug)
     end
 
     test "change_organization_for/1 returns a organization changeset" do

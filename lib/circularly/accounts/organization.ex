@@ -15,11 +15,11 @@ defmodule Circularly.Accounts.Organization do
     field :name, :string
     field :slug, :string
 
-    has_many :permissions, Circularly.Accounts.Permission,
+    has_many :user_org_memberships, Circularly.Accounts.UserOrgMembership,
       foreign_key: :org_id,
       references: :org_id
 
-    has_many :permitted_users, through: [:permissions, :user]
+    has_many :permitted_users, through: [:user_org_memberships, :user]
     timestamps()
   end
 

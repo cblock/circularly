@@ -111,21 +111,24 @@ defmodule CircularlyWeb.UserAuth do
     end
   end
 
-  def fetch_current_organization(
-        %{
-          path_params: %{"org_slug" => org_slug},
-          assigns: %{current_user: user}
-        } = conn,
+  @doc """
+  Checks if :current_user has a user_org_membership for the given organization and set `:current_user_org_membership` accordingly
+  otherwise conn will be halted
+  """
+  def require_user_org_membership(
+        %{path_params: %{"org_slug" => org_slug}, assigns: %{current_user: user}} = conn,
         _opts
       ) do
-    case Accounts.get_organization_and_permission_for(user, org_slug) do
-      {:ok, organization: organization, permission: permission} ->
+    case Accounts.get_user_org_membership(user, org_slug) do
+      {:ok, user_org_membership} ->
         conn
-        |> assign(:current_organization, organization)
-        |> assign(:current_permission, permission)
+        |> assign(:current_user_org_membership, user_org_membership)
 
       _ ->
         conn
+        |> put_flash(:error, "Organization does not exist or not accessible.")
+        |> redirect(to: Routes.organization_index_path(conn, :index))
+        |> halt()
     end
   end
 
@@ -165,31 +168,6 @@ defmodule CircularlyWeb.UserAuth do
       |> put_flash(:error, "You must log in to access this page.")
       |> maybe_store_return_to()
       |> redirect(to: Routes.user_session_path(conn, :new))
-      |> halt()
-    end
-  end
-
-  @doc """
-  Used for routes that require an organization the user is permitted to access (i.e. tenant-specific routes)
-  """
-  def require_authorized_organization(conn, _opts) do
-    if conn.assigns[:current_organization] && conn.assigns[:current_permission] do
-      Logger.debug("organization access authorized",
-        current_user: conn.assigns[:current_user],
-        current_organization: conn.assigns[:current_organization],
-        rights: conn.assigns[:current_permission]
-      )
-
-      conn
-    else
-      Logger.warn("unauthorized organization access",
-        current_user: conn.assigns[:current_user],
-        org_slug: conn.path_params[:org_slug]
-      )
-
-      conn
-      |> put_flash(:error, "Organization does not exist or not accessible.")
-      |> redirect(to: Routes.organization_index_path(conn, :index))
       |> halt()
     end
   end

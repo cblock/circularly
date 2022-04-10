@@ -13,12 +13,6 @@ defmodule CircularlyWeb.Router do
     plug :fetch_current_user
   end
 
-  pipeline :ensure_tenant do
-    plug :require_authenticated_user
-    plug :fetch_current_organization
-    plug :require_authorized_organization
-  end
-
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -102,7 +96,7 @@ defmodule CircularlyWeb.Router do
 
   ## Tenant-specific routes
   scope "/o/:org_slug", CircularlyWeb do
-    pipe_through [:browser, :ensure_tenant]
+    pipe_through [:browser, :require_authenticated_user, :require_user_org_membership]
     get "/", PageController, :index
   end
 end

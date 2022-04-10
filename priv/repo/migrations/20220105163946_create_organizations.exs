@@ -9,7 +9,7 @@ defmodule Circularly.Repo.Migrations.CreateOrganizations do
       timestamps(type: :utc_datetime)
     end
 
-    create table(:permissions, primary_key: false) do
+    create table(:user_org_memberships, primary_key: false) do
       add :id, :binary_id, primary_key: true
 
       add(
@@ -19,10 +19,10 @@ defmodule Circularly.Repo.Migrations.CreateOrganizations do
       )
 
       add :user_id, references(:users, type: :binary_id, on_delete: :delete_all), null: false
-      add :rights, {:array, :string}
+      add :roles, {:array, :string}
       timestamps(type: :utc_datetime)
     end
 
-    create unique_index(:permissions, [:org_id, :user_id])
+    create unique_index(:user_org_memberships, [:org_id, :user_id])
   end
 end
