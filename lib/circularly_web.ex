@@ -45,7 +45,6 @@ defmodule CircularlyWeb do
   def live_view do
     quote do
       use Phoenix.LiveView, layout: {CircularlyWeb.LayoutView, "live.html"}
-      import CircularlyWeb.UserAuth, only: [assign_current_user_to_socket: 2]
 
       unquote(view_helpers())
     end

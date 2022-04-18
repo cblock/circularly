@@ -5,6 +5,7 @@ defmodule CircularlyWeb.UserAuth do
 
   require Logger
 
+  alias Phoenix.LiveView
   alias Circularly.Accounts
   alias CircularlyWeb.Router.Helpers, as: Routes
 
@@ -92,9 +93,13 @@ defmodule CircularlyWeb.UserAuth do
   and remember me token.
   """
   def fetch_current_user(conn, _opts) do
-    {user_token, conn} = ensure_user_token(conn)
-    user = user_token && Accounts.get_user_by_session_token(user_token)
-    assign(conn, :current_user, user)
+    with {user_token, conn} <- ensure_user_token(conn),
+         {:ok, current_user} <- Accounts.get_user_by_session_token(user_token) do
+      assign(conn, :current_user, current_user)
+    else
+      _ ->
+        assign(conn, :current_user, nil)
+    end
   end
 
   defp ensure_user_token(conn) do
@@ -112,33 +117,50 @@ defmodule CircularlyWeb.UserAuth do
   end
 
   @doc """
-  Checks if :current_user has a user_org_membership for the given organization and set `:current_user_org_membership` accordingly
-  otherwise conn will be halted
+   Sets `:current user` and `:current_user_org_membership` on LiveView socket
   """
-  def require_user_org_membership(
-        %{path_params: %{"org_slug" => org_slug}, assigns: %{current_user: user}} = conn,
-        _opts
+  def on_mount(
+        :assign_current_user,
+        _params,
+        %{"user_token" => user_token} = _session,
+        socket
       ) do
-    case Accounts.get_user_org_membership(user, org_slug) do
-      {:ok, user_org_membership} ->
-        conn
-        |> assign(:current_user_org_membership, user_org_membership)
+    case Accounts.get_user_by_session_token(user_token) do
+      {:ok, current_user} ->
+        new_socket = LiveView.assign_new(socket, :current_user, fn -> current_user end)
+        {:cont, new_socket}
 
       _ ->
-        conn
-        |> put_flash(:error, "Organization does not exist or not accessible.")
-        |> redirect(to: Routes.organization_index_path(conn, :index))
-        |> halt()
+        {:halt, live_redirect_require_login(socket)}
     end
   end
 
-  @doc """
-  Retrieves current user from user_token and assigns it to the given (liveview) socket as :current_user
-  """
-  def assign_current_user_to_socket(socket, user_token) do
-    Phoenix.LiveView.assign_new(socket, :current_user, fn ->
-      Accounts.get_user_by_session_token(user_token)
-    end)
+  def on_mount(
+        :assign_current_user_and_org_membership,
+        %{"org_slug" => org_slug} = _params,
+        %{"user_token" => user_token} = _session,
+        socket
+      ) do
+    with {:ok, current_user} <- Accounts.get_user_by_session_token(user_token),
+         {:ok, current_user_org_membership} <-
+           Accounts.get_user_org_membership(current_user, org_slug) do
+      new_socket =
+        socket
+        |> LiveView.assign_new(:current_user, fn -> current_user end)
+        |> LiveView.assign_new(:current_user_org_membership, fn -> current_user_org_membership end)
+
+      {:cont, new_socket}
+    else
+      _ ->
+        {:halt,
+         live_redirect_require_login(socket, "This resource does not exist or cannot be accessed")}
+    end
+  end
+
+  defp live_redirect_require_login(socket, error_message \\ "Please sign in") do
+    socket
+    |> LiveView.put_flash(:error, error_message)
+    |> LiveView.redirect(to: Routes.user_session_path(socket, :new))
   end
 
   @doc """
