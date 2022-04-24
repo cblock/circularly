@@ -7,7 +7,7 @@ defmodule CircularlyWeb.OrganizationLive.Index do
   alias Circularly.Accounts.Organization
 
   @impl true
-  def mount(_params, %{"user_token" => token} = _session, socket) do
+  def mount(_params, _session, socket) do
     {:ok,
      socket
      |> assign_organizations()}

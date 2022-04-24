@@ -103,6 +103,13 @@ defmodule CircularlyWeb.Router do
     live_session :tenant,
       on_mount: {CircularlyWeb.UserAuth, :assign_current_user_and_org_membership} do
       live "/", DashboardLive.Index, :index
+
+      live "/people", PersonLive.Index, :index
+      live "/people/new", PersonLive.Index, :new
+      live "/people/:id/edit", PersonLive.Index, :edit
+
+      live "/people/:id", PersonLive.Show, :show
+      live "/people/:id/show/edit", PersonLive.Show, :edit
     end
   end
 end

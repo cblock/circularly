@@ -1,0 +1,36 @@
+<h1>Show Person</h1>
+
+<%= if @live_action in [:edit] do %>
+  <.modal return_to={Routes.person_show_path(@socket, :show, @current_user_org_membership.organization, @person)}>
+    <.live_component
+      module={CircularlyWeb.PersonLive.FormComponent}
+      id={@person.id}
+      title={@page_title}
+      action={@live_action}
+      person={@person}
+      return_to={Routes.person_show_path(@socket, :show, @current_user_org_membership.organization, @person)}
+    />
+  </.modal>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @person.name %>
+  </li>
+
+  <li>
+    <strong>Description:</strong>
+    <%= @person.description %>
+  </li>
+
+  <li>
+    <strong>Joined at:</strong>
+    <%= @person.joined_at %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.person_show_path(@socket, :edit, @current_user_org_membership.organization, @person), class: "button" %></span> |
+<span><%= live_redirect "Back", to: Routes.person_index_path(@socket, :index, @current_user_org_membership.organization) %></span>

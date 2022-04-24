@@ -1,0 +1,43 @@
+<h1>Listing People</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <.modal return_to={Routes.person_index_path(@socket, :index, @current_user_org_membership.organization)}>
+    <.live_component
+      module={CircularlyWeb.PersonLive.FormComponent}
+      id={@person.id || :new}
+      title={@page_title}
+      action={@live_action}
+      person={@person}
+      return_to={Routes.person_index_path(@socket, :index, @current_user_org_membership.organization)}
+    />
+  </.modal>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Joined at</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="people">
+    <%= for person <- @people do %>
+      <tr id={"person-#{person.id}"}>
+        <td><%= person.name %></td>
+        <td><%= person.description %></td>
+        <td><%= person.joined_at %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.person_show_path(@socket, :show, @current_user_org_membership.organization, person) %></span>
+          <span><%= live_patch "Edit", to: Routes.person_index_path(@socket, :edit, @current_user_org_membership.organization, person) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: person.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Person", to: Routes.person_index_path(@socket, :new, @current_user_org_membership.organization) %></span>

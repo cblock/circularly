@@ -149,6 +149,7 @@ defmodule CircularlyWeb.UserAuth do
         |> LiveView.assign_new(:current_user, fn -> current_user end)
         |> LiveView.assign_new(:current_user_org_membership, fn -> current_user_org_membership end)
 
+      Circularly.Repo.put_org_id(current_user_org_membership.org_id)
       {:cont, new_socket}
     else
       _ ->
