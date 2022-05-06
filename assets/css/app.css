@@ -3,3 +3,13 @@
 @import "tailwindcss/utilities";
 
 [x-cloak] { display: none !important; }
+
+@layer base {
+    input.default {
+        @apply block w-full border py-3 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm placeholder-transparent;
+    }
+
+    label.default {
+        @apply absolute left-2 -top-2 px-1 block text-xs font-medium text-gray-700 bg-white peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2.5 transition-all peer-focus:text-teal-600 peer-focus:-top-2 peer-focus:text-xs 
+    }
+}

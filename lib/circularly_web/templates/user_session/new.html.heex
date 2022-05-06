@@ -20,27 +20,16 @@
           <%= render CircularlyWeb.LayoutView, "_form_notifications.html", message: @error_message %>
         <% end %>
 
+  
         <div class="relative">
-          <%= email_input f, :email, 
-            required: true, 
-            class: "peer block w-full border py-3 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm placeholder-transparent",
-            placeholder: dgettext("auth", "Email")
-          %>
-          <%= label f, :email, dgettext("auth", "Email"), 
-            class: "absolute left-2 -top-2 px-1 block text-xs font-medium text-gray-700 bg-white peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2.5 transition-all peer-focus:text-teal-600 peer-focus:-top-2 peer-focus:text-xs" 
-          %>
+          <%= email_input f, :email, required: true, class: "peer default", placeholder: dgettext("auth", "Email") %>
+          <%= label f, :email, dgettext("auth", "Email"), class: "default" %>
           <%= error_tag f, :email %>  
         </div>
 
         <div class="relative">
-          <%= password_input f, :password, 
-            required: true, 
-            class: "peer block w-full border py-3 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm placeholder-transparent",
-            placeholder: dgettext("auth", "Password")
-          %>
-          <%= label f, :password, dgettext("auth", "Password"), 
-            class: "absolute left-2 -top-2 px-1 block text-xs font-medium text-gray-700 bg-white peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2.5 transition-all peer-focus:text-teal-600 peer-focus:-top-2 peer-focus:text-xs" 
-          %>
+          <%= password_input f, :password, required: true, class: "peer default", placeholder: dgettext("auth", "Password") %>
+          <%= label f, :password, dgettext("auth", "Password"), class: "default" %>
           <%= error_tag f, :password %>  
         </div>
 
