@@ -1,7 +1,5 @@
 <%= if @current_user do %>
-<div 
-  x-data="{ open: false, activeIndex: -1, max: 2 }" class="ml-3 relative"
->
+<div x-data="{ open: false, activeIndex: -1, max: 2 }" class="ml-3 relative">
   <div>
     <button 
       type="button" 
@@ -10,7 +8,7 @@
       x-ref="button" 
       @click="open = !open" 
       @keydown.escape.window="open = false"
-      @keydown.enter.prevent="open = true" 
+      @keydown.enter.prevent="activeIndex === -1 ? open = true : document.getElementById('user-menu-item-'+activeIndex).click()"
       aria-expanded="false" 
       aria-haspopup="true" 
       x-bind:aria-expanded="open.toString()" 
@@ -40,16 +38,11 @@
       tabindex="-1" 
       @click.away="open = false"
       @keydown.tab="open = false" 
-      @keydown.enter.prevent="open = false" 
-      @keyup.space.prevent="open = false" 
-
     >
   
-        <a href="#" class="block px-4 py-2 text-sm text-gray-700" x-state:on="Active" x-state:off="Not Active" :class="{ 'bg-gray-100': activeIndex === 0 }" role="menuitem" tabindex="-1" id="user-menu-item-0" @mouseenter="activeIndex = 0" @mouseleave="activeIndex = -1" @click="open = false"><%= @current_user.email %></a>
-        
-        <%= link "Profile", to: Routes.user_settings_path(@conn, :edit), class: "block px-4 py-2 text-sm text-gray-700", ":class": "{ 'bg-gray-100': activeIndex === 1 }", role: "menuitem", tabindex: "-1", id: "user-menu-item-1", "@mouseenter": "activeIndex = 1", "@mouseleave": "activeIndex = -1", "@click": "open = false" %>
-        <%= link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete, class: "block px-4 py-2 text-sm text-gray-700", ":class": "{ 'bg-gray-100': activeIndex === 2 }", role: "menuitem", tabindex: "-1", id: "user-menu-item-2", "@mouseenter": "activeIndex = 2", "@mouseleave": "activeIndex = -1", "@click": "open = false" %>
-        
+        <a href="#" id="user-menu-item-0" class="block px-4 py-2 text-sm text-gray-700" x-state:on="Active" x-state:off="Not Active" :class="{ 'bg-gray-100': activeIndex === 0 }" role="menuitem" tabindex="-1" @mouseenter="activeIndex = 0" @mouseleave="activeIndex = -1"><%= @current_user.email %></a>  
+        <%= link "Profile", to: Routes.user_settings_path(@conn, :edit), id: "user-menu-item-1", class: "block px-4 py-2 text-sm text-gray-700", ":class": "{ 'bg-gray-100': activeIndex === 1 }", role: "menuitem", tabindex: "-1", "@mouseenter": "activeIndex = 1", "@mouseleave": "activeIndex = -1" %>
+        <%= link "Log out", to: Routes.user_session_path(@conn, :delete), id: "user-menu-item-2", method: :delete, class: "block px-4 py-2 text-sm text-gray-700", ":class": "{ 'bg-gray-100': activeIndex === 2 }", role: "menuitem", tabindex: "-1", "@mouseenter": "activeIndex = 2", "@mouseleave": "activeIndex = -1" %>        
       
     </div>
   
