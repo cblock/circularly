@@ -35,7 +35,7 @@ defmodule CircularlyWeb.UserRegistrationControllerTest do
       conn = get(conn, "/")
       response = html_response(conn, 200)
       assert response =~ email
-      assert response =~ "Settings</a>"
+      assert response =~ "Profile</a>"
       assert response =~ "Log out</a>"
     end
 

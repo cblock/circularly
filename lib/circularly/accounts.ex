@@ -275,10 +275,16 @@ defmodule Circularly.Accounts do
   @doc """
   Gets the user with the given signed token.
   """
-  @spec get_user_by_session_token(String.t()) :: User.t() | nil | Ecto.MultipleResultsError
+  @spec get_user_by_session_token(String.t()) :: {:ok, User.t()} | {:error, String.t()}
+  def get_user_by_session_token(token) when is_nil(token), do: {:error, "not found"}
+
   def get_user_by_session_token(token) do
-    {:ok, query} = UserToken.verify_session_token_query(token)
-    Repo.one(query, skip_org_id: true)
+    with {:ok, query} <- UserToken.verify_session_token_query(token),
+         %User{} = user <- Repo.one(query, skip_org_id: true) do
+      {:ok, user}
+    else
+      _ -> {:error, "not found"}
+    end
   end
 
   @doc """

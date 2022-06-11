@@ -54,13 +54,15 @@ defmodule CircularlyWeb.Router do
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
 
-    live "/", OrganizationLive.Index, :index
-    live "/organizations", OrganizationLive.Index, :index
-    live "/organizations/new", OrganizationLive.Index, :new
-    live "/organizations/:id/edit", OrganizationLive.Index, :edit
+    live_session :org_admin, on_mount: {CircularlyWeb.UserAuth, :assign_current_user} do
+      live "/", OrganizationLive.Index, :index
+      live "/organizations", OrganizationLive.Index, :index
+      live "/organizations/new", OrganizationLive.Index, :new
+      live "/organizations/:id/edit", OrganizationLive.Index, :edit
 
-    live "/organizations/:id", OrganizationLive.Show, :show
-    live "/organizations/:id/show/edit", OrganizationLive.Show, :edit
+      live "/organizations/:id", OrganizationLive.Show, :show
+      live "/organizations/:id/show/edit", OrganizationLive.Show, :edit
+    end
   end
 
   scope "/", CircularlyWeb do
@@ -96,7 +98,18 @@ defmodule CircularlyWeb.Router do
 
   ## Tenant-specific routes
   scope "/o/:org_slug", CircularlyWeb do
-    pipe_through [:browser, :require_authenticated_user, :require_user_org_membership]
-    get "/", PageController, :index
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :tenant,
+      on_mount: {CircularlyWeb.UserAuth, :assign_current_user_and_org_membership} do
+      live "/", DashboardLive.Index, :index
+
+      live "/people", PersonLive.Index, :index
+      live "/people/new", PersonLive.Index, :new
+      live "/people/:id/edit", PersonLive.Index, :edit
+
+      live "/people/:id", PersonLive.Show, :show
+      live "/people/:id/show/edit", PersonLive.Show, :edit
+    end
   end
 end

@@ -28,7 +28,7 @@
         <td><%= organization.name || gettext("My Organization") %></td>
 
         <td>
-          <span><%= live_redirect "Use", to: Routes.page_path(@socket, :index, organization) %></span>
+          <span><%= live_redirect "Use", to: Routes.dashboard_index_path(@socket, :index, organization) %></span>
           <span><%= live_redirect "Show", to: Routes.organization_show_path(@socket, :show, organization) %></span>
           <span><%= live_patch "Edit", to: Routes.organization_index_path(@socket, :edit, organization) %></span>
           <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_slug: organization.slug, data: [confirm: "Are you sure?"] %></span>

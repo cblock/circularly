@@ -22,7 +22,7 @@ defmodule CircularlyWeb.UserAuthTest do
       assert token = get_session(conn, :user_token)
       assert get_session(conn, :live_socket_id) == "users_sessions:#{Base.url_encode64(token)}"
       assert redirected_to(conn) == "/"
-      assert Accounts.get_user_by_session_token(token)
+      assert {:ok, _} = Accounts.get_user_by_session_token(token)
     end
 
     test "clears everything previously stored in the session", %{conn: conn, user: user} do
@@ -60,7 +60,7 @@ defmodule CircularlyWeb.UserAuthTest do
       refute conn.cookies[@remember_me_cookie]
       assert %{max_age: 0} = conn.resp_cookies[@remember_me_cookie]
       assert redirected_to(conn) == "/"
-      refute Accounts.get_user_by_session_token(user_token)
+      assert {:error, "not found"} = Accounts.get_user_by_session_token(user_token)
     end
 
     test "broadcasts to the given live_socket_id", %{conn: conn} do

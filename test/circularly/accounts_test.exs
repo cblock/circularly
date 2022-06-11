@@ -364,12 +364,16 @@ defmodule Circularly.AccountsTest do
     end
 
     test "returns user by token", %{user: user, token: token} do
-      assert session_user = Accounts.get_user_by_session_token(token)
+      assert {:ok, session_user} = Accounts.get_user_by_session_token(token)
       assert session_user.id == user.id
     end
 
     test "does not return user for invalid token" do
-      refute Accounts.get_user_by_session_token("oops")
+      assert {:error, "not found"} = Accounts.get_user_by_session_token("oops")
+    end
+
+    test "does not return user for nil as token" do
+      assert {:error, "not found"} = Accounts.get_user_by_session_token(nil)
     end
 
     test "does not return user for expired token", %{token: token} do
@@ -378,7 +382,7 @@ defmodule Circularly.AccountsTest do
           skip_org_id: true
         )
 
-      refute Accounts.get_user_by_session_token(token)
+      assert {:error, "not found"} = Accounts.get_user_by_session_token(token)
     end
   end
 
@@ -387,7 +391,7 @@ defmodule Circularly.AccountsTest do
       user = user_fixture()
       token = Accounts.generate_user_session_token(user)
       assert Accounts.delete_session_token(token) == :ok
-      refute Accounts.get_user_by_session_token(token)
+      assert {:error, "not found"} = Accounts.get_user_by_session_token(token)
     end
   end
 
