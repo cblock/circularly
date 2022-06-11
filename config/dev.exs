@@ -26,6 +26,7 @@ config :circularly, CircularlyWeb.Endpoint,
   watchers: [
     # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+    esbuild: {Esbuild, :install_and_run, [:catalogue, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 
@@ -55,12 +56,14 @@ config :circularly, CircularlyWeb.Endpoint,
 
 # Watch static and templates for browser reloading.
 config :circularly, CircularlyWeb.Endpoint,
+  reloadable_compilers: [:gettext, :elixir, :surface],
   live_reload: [
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/circularly_web/(live|views)/.*(ex)$",
-      ~r"lib/circularly_web/templates/.*(eex)$"
+      ~r"lib/circularly_web/(live|views|components)/.*(ex|sface|js)$",
+      ~r"lib/circularly_web/templates/.*(eex)$",
+      ~r"priv/catalogue/.*(ex)$"
     ]
   ]
 

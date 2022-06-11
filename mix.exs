@@ -7,7 +7,7 @@ defmodule Circularly.MixProject do
       version: "0.1.0",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:gettext] ++ Mix.compilers(),
+      compilers: [:gettext] ++ Mix.compilers() ++ [:surface],
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
@@ -34,6 +34,7 @@ defmodule Circularly.MixProject do
 
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:dev), do: ["lib"] ++ catalogues()
   defp elixirc_paths(_), do: ["lib"]
 
   # Cache dialyzer plt files
@@ -74,7 +75,9 @@ defmodule Circularly.MixProject do
       {:ex_doc, ">= 0.0.0", only: [:dev, :test], runtime: false},
       {:sobelow, ">= 0.0.0", only: [:dev, :test], runtime: false},
       {:inch_ex, github: "rrrene/inch_ex", only: [:dev, :test]},
-      {:excoveralls, "~> 0.10", only: [:dev, :test]}
+      {:excoveralls, "~> 0.10", only: [:dev, :test]},
+      {:surface, "~> 0.7.4"},
+      {:surface_catalogue, "~> 0.4.0"}
     ]
   end
 
@@ -91,6 +94,12 @@ defmodule Circularly.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
+    ]
+  end
+
+  def catalogues do
+    [
+      "priv/catalogue"
     ]
   end
 end

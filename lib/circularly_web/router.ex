@@ -1,6 +1,8 @@
 defmodule CircularlyWeb.Router do
   use CircularlyWeb, :router
 
+  import Surface.Catalogue.Router
+
   import CircularlyWeb.UserAuth
 
   pipeline :browser do
@@ -93,6 +95,7 @@ defmodule CircularlyWeb.Router do
 
       live_dashboard "/dashboard", metrics: CircularlyWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
+      surface_catalogue("/catalogue")
     end
   end
 
