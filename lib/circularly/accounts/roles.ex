@@ -21,7 +21,7 @@ defmodule Circularly.Accounts.Roles do
   """
   def admin, do: :admin
 
-  #  TODO: Implement once we implement subscriptions and billing
+  #  LATER: Implement once we implement subscriptions and billing
   # @doc """
   # The highest level of control. This role includes all Admin functionality and additionally billing management
   # """

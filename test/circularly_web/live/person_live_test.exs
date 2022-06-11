@@ -43,8 +43,8 @@ defmodule CircularlyWeb.PersonLiveTest do
     test "saves new person", %{conn: conn, organization: organization} do
       {:ok, index_live, _html} = live(conn, Routes.person_index_path(conn, :index, organization))
 
-      assert index_live |> element("a", "New Person") |> render_click() =~
-               "New Person"
+      assert index_live |> element("a", "Add Person") |> render_click() =~
+               "Add Person"
 
       assert_patch(index_live, Routes.person_index_path(conn, :new, organization))
 

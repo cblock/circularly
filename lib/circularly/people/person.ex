@@ -1,4 +1,7 @@
 defmodule Circularly.People.Person do
+  @moduledoc """
+  Person module represents a human in a particular organization
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

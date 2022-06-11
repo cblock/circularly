@@ -1,4 +1,7 @@
 defmodule CircularlyWeb.PersonLive.FormComponent do
+  @moduledoc """
+  form component for rendering form elements that allow creating / updating a person's details
+  """
   use CircularlyWeb, :live_component
 
   alias Circularly.People

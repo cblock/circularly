@@ -1,4 +1,7 @@
 defmodule CircularlyWeb.PersonLive.Show do
+  @moduledoc """
+  Liveview that handles displaying a person's details
+  """
   use CircularlyWeb, :live_view
 
   alias Circularly.People

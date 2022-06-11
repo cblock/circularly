@@ -1,4 +1,7 @@
 defmodule CircularlyWeb.PersonLive.Index do
+  @moduledoc """
+  Liveview that renders a list of people belonging to a specific organization
+  """
   use CircularlyWeb, :live_view
 
   alias Circularly.People
@@ -22,7 +25,7 @@ defmodule CircularlyWeb.PersonLive.Index do
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New Person")
+    |> assign(:page_title, "Add Person")
     |> assign(:person, %Person{})
   end
 
