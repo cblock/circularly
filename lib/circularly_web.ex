@@ -40,6 +40,11 @@ defmodule CircularlyWeb do
       # Include shared imports and aliases for views
       unquote(view_helpers())
       import Surface
+      alias Surface.Components.{Link, Form}
+      alias Surface.Components.Form.{Field, Label, PasswordInput, EmailInput, ErrorTag}
+      alias CircularlyWeb.Components.Button
+
+      use Surface.View, root: "lib/circularly_web/templates"
     end
   end
 
