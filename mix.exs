@@ -77,7 +77,8 @@ defmodule Circularly.MixProject do
       {:inch_ex, github: "rrrene/inch_ex", only: [:dev, :test]},
       {:excoveralls, "~> 0.10", only: [:dev, :test]},
       {:surface, "~> 0.7.4"},
-      {:surface_catalogue, "~> 0.4.0"}
+      {:surface_catalogue, "~> 0.4.0"},
+      {:licensir, "~> 0.7", only: :dev, runtime: false}
     ]
   end
 
