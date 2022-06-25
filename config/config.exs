@@ -56,10 +56,21 @@ config :esbuild,
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ],
   catalogue: [
-    args: ~w(../deps/surface_catalogue/assets/js/app.js --bundle --target=es2016 --minify --outdir=../priv/static/assets/catalogue),
+    args:
+      ~w(../deps/surface_catalogue/assets/js/app.js --bundle --target=es2016 --minify --outdir=../priv/static/assets/catalogue),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
+
+# Configure Surface's error translator
+config :surface, :components, [
+  {Surface.Components.Form.ErrorTag,
+   default_translator: {CircularlyWeb.ErrorHelpers, :translate_error}},
+  {Surface.Components.Form.Field, default_class: "relative"},
+  {Surface.Components.Form.Label, default_class: "default"},
+  {Surface.Components.Form.EmailInput, default_class: "peer default"},
+  {Surface.Components.Form.PasswordInput, default_class: "peer default"}
+]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -70,7 +81,8 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 
 config :surface, :components, [
-  {Surface.Components.Form.ErrorTag, default_translator: {CircularlyWeb.ErrorHelpers, :translate_error}}
+  {Surface.Components.Form.ErrorTag,
+   default_translator: {CircularlyWeb.ErrorHelpers, :translate_error}}
 ]
 
 # Import environment specific config. This must remain at the bottom

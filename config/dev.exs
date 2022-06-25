@@ -62,7 +62,7 @@ config :circularly, CircularlyWeb.Endpoint,
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/circularly_web/(live|views|components)/.*(ex|sface|js)$",
-      ~r"lib/circularly_web/templates/.*(eex)$",
+      ~r"lib/circularly_web/templates/.*(eex|sface)$",
       ~r"priv/catalogue/.*(ex)$"
     ]
   ]
