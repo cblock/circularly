@@ -1,0 +1,46 @@
+<AuthLayout>
+  <:header>
+    <img width="100" height="100" class="mx-auto h-16 w-auto text-teal-600" src={Routes.static_url(@conn, "/images/circularly.svg")}/>      
+    <h1 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+      { dgettext("auth", "Sign in to your account") }
+    </h1>
+    <p class="mt-2 text-center text-sm text-gray-600">
+      { gettext "Or" }
+      <Link label={dgettext("auth", "start your 14-day free trial" )} to={Routes.user_registration_path(@conn, :new)}
+        class="default" />
+    </p>
+  </:header>
+
+  <Form for={@conn} action={Routes.user_session_path(@conn, :create)} as={:user} class="space-y-6">
+    {#if @error_message}
+      { render CircularlyWeb.LayoutView, "_form_notifications.html", message: @error_message }
+    {/if}
+    <Field name={:email}>
+      <EmailInput opts={placeholder: dgettext("auth", "Email"), autofocus: "autofocus"}/>
+      <Label />
+      <ErrorTag />
+    </Field>
+    
+    <Field name={:password}>
+      <PasswordInput opts={placeholder: dgettext("auth", "Password")} />
+      <Label />
+      <ErrorTag />
+    </Field>
+    
+    <div class="flex items-center justify-between">
+      <Field name={:remember_me} class="flex items-center">
+        <Checkbox class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded-md"/>
+        <Label class="ml-3 block text-sm text-gray-900" />
+      </Field>
+        <div class="text-sm">
+        { link dgettext("auth", "Forgot your password?"), to: Routes.user_reset_password_path(@conn, :new), class: "font-medium text-teal-600 hover:text-teal-500" }
+      </div>
+    </div>
+    
+    <div>
+      <Button width="full" size="sm" color="primary">
+      { dgettext "auth", "Sign in" }
+      </Button>
+    </div>
+  </Form>
+</AuthLayout>
