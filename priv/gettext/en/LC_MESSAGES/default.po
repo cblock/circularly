@@ -11,15 +11,17 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2\n"
 
-#, elixir-format, ex-autogen
-#: lib/circularly_web/templates/page/index.html.heex:2
-msgid "Welcome to %{name}!"
+#, elixir-autogen, elixir-format
+#: lib/circularly_web/templates/user_confirmation/new.html.heex:11
+#: lib/circularly_web/templates/user_registration/new.sface:14
+#: lib/circularly_web/templates/user_reset_password/edit.sface:14
+#: lib/circularly_web/templates/user_reset_password/new.sface:14
+#: lib/circularly_web/templates/user_session/new.sface:8
+msgid "Or"
 msgstr ""
 
-#, elixir-format, ex-autogen
-#: lib/circularly_web/templates/user_confirmation/new.html.heex:11
-#: lib/circularly_web/templates/user_registration/new.html.heex:14
-#: lib/circularly_web/templates/user_reset_password/new.html.heex:11
-#: lib/circularly_web/templates/user_session/new.html.heex:11
-msgid "Or"
+#, elixir-autogen, elixir-format
+#: lib/circularly_web/live/organization_live/index.html.heex:28
+#: lib/circularly_web/live/organization_live/show.html.heex:21
+msgid "My Organization"
 msgstr ""
