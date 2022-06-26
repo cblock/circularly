@@ -1,87 +1,84 @@
-<div class="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-  <div class="sm:mx-auto sm:w-full sm:max-w-md">
-
-
-    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-auto text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <title>Circularly</title>
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+<AuthLayout>
+  <:header>
+    <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-auto text-teal-600" fill="currentColor" viewBox="0 0 100 100" stroke="currentColor">      
+      <path d="M49.333,2.553c-26.163,0-47.448,21.285-47.448,47.448S23.17,97.449,49.333,97.449s47.448-21.285,47.448-47.448 S75.496,2.553,49.333,2.553z M80.32,24.166c0,3.577-2.91,6.487-6.486,6.487c-3.577,0-6.487-2.91-6.487-6.487 c0-3.576,2.91-6.486,6.487-6.486C77.41,17.68,80.32,20.59,80.32,24.166z M58.97,14.833c0,3.016-2.454,5.47-5.47,5.47    s-5.47-2.454-5.47-5.47s2.454-5.47,5.47-5.47S58.97,11.817,58.97,14.833z M38.207,15.833c0,2.596-2.111,4.707-4.707,4.707    s-4.707-2.111-4.707-4.707s2.111-4.707,4.707-4.707S38.207,13.237,38.207,15.833z M6.137,50.001    c0-14.64,7.327-27.594,18.501-35.41c-0.058,0.407-0.097,0.819-0.097,1.242c0,4.94,4.019,8.959,8.959,8.959    c0.913,0,1.795-0.139,2.625-0.395c-2.703,1.544-4.533,4.45-4.533,7.78c0,4.94,4.019,8.959,8.959,8.959s8.959-4.019,8.959-8.959    s-4.019-8.959-8.959-8.959c-0.913,0-1.795,0.139-2.625,0.395c2.703-1.544,4.533-4.45,4.533-7.78c0-3.193-1.685-5.994-4.207-7.581    c3.12-0.829,6.377-1.31,9.729-1.413c-2.536,1.757-4.203,4.683-4.203,7.994c0,5.36,4.361,9.722,9.722,9.722    s9.722-4.361,9.722-9.722c0-2.499-0.956-4.772-2.511-6.496c4.197,1.147,8.138,2.913,11.725,5.192    c-5.262,0.689-9.341,5.19-9.341,10.637c0,5.922,4.817,10.739,10.739,10.739c5.638,0,10.265-4.37,10.695-9.899    c2.613,3.669,4.678,7.754,6.049,12.146c-1.987-1.457-4.43-2.328-7.077-2.328c-6.623,0-12.011,5.387-12.011,12.009    c0,6.623,5.388,12.011,12.011,12.011c3.436,0,6.531-1.458,8.722-3.779c-0.595,5.072-2.07,9.876-4.272,14.258    C86.714,63.49,81.529,59.1,75.335,59.1c-7.114,0-12.901,5.786-12.901,12.898c0,6.929,5.494,12.583,12.353,12.874    c-7.144,5.229-15.942,8.325-25.453,8.325C25.515,93.197,6.137,73.819,6.137,50.001z M40.551,27.471    c2.596,0,4.707,2.111,4.707,4.707s-2.111,4.707-4.707,4.707s-4.707-2.111-4.707-4.707S37.955,27.471,40.551,27.471z     M91.258,46.832c0,4.278-3.479,7.759-7.757,7.759c-4.278,0-7.759-3.48-7.759-7.759c0-4.277,3.48-7.757,7.759-7.757    C87.778,39.075,91.258,42.555,91.258,46.832z M75.335,80.647c-4.77,0-8.649-3.88-8.649-8.649c0-4.768,3.88-8.646,8.649-8.646    c4.768,0,8.646,3.879,8.646,8.646C83.981,76.768,80.103,80.647,75.335,80.647z"></path><path d="M58.551,50.899c5.36,0,9.722-4.361,9.722-9.722s-4.361-9.722-9.722-9.722s-9.722,4.361-9.722,9.722 S53.19,50.899,58.551,50.899z M58.551,35.708c3.016,0,5.47,2.454,5.47,5.47s-2.454,5.47-5.47,5.47s-5.47-2.454-5.47-5.47 S55.535,35.708,58.551,35.708z"></path>
+      <path d="M52.217,51.105c-5.921,0-10.738,4.817-10.738,10.739c0,5.921,4.817,10.738,10.738,10.738 c5.922,0,10.739-4.817,10.739-10.738C62.956,55.923,58.139,51.105,52.217,51.105z M52.217,68.331c-3.576,0-6.486-2.91-6.486-6.486 c0-3.577,2.91-6.487,6.486-6.487c3.577,0,6.487,2.91,6.487,6.487C58.704,65.421,55.794,68.331,52.217,68.331z"></path>
+      <path d="M33.55,64.168c-6.622,0-12.009,5.388-12.009,12.011c0,6.622,5.387,12.009,12.009,12.009 c6.623,0,12.011-5.387,12.011-12.009C45.561,69.556,40.173,64.168,33.55,64.168z M33.55,83.936c-4.277,0-7.757-3.479-7.757-7.757 c0-4.278,3.479-7.759,7.757-7.759c4.278,0,7.759,3.48,7.759,7.759C41.309,80.456,37.828,83.936,33.55,83.936z"></path>
+      <path d="M35.617,52.013c0-7.114-5.787-12.901-12.901-12.901c-7.112,0-12.898,5.787-12.898,12.901 c0,7.112,5.786,12.898,12.898,12.898C29.83,64.911,35.617,59.125,35.617,52.013z M14.069,52.013c0-4.77,3.879-8.649,8.646-8.649 c4.77,0,8.649,3.88,8.649,8.649c0,4.768-3.88,8.646-8.649,8.646C17.948,60.659,14.069,56.78,14.069,52.013z"></path>     
     </svg>
-
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+  
+    <h1 class="mt-6 text-center text-3xl font-extrabold text-gray-800">
       { dgettext("auth", "Register a new account") }
-    </h2>
+    </h1>
     <p class="mt-2 text-center text-sm text-gray-600">
       { gettext "Or" }
-      <Link label={dgettext("auth", "sign in to your account")} to={Routes.user_session_path(@conn, :new)} class="default"/>
+      <Link label={dgettext("auth", "sign in to your account" )} to={Routes.user_session_path(@conn, :new)}
+        class="default" />
     </p>
-  </div>
+  </:header>
 
-  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-      <Form for={@changeset} action={Routes.user_registration_path(@conn, :create)} class="space-y-6">
-        {#if @changeset.action}
-        { render CircularlyWeb.LayoutView, "_form_notifications.html", message: dgettext("errors", "Oops, something went wrong! Please check the errors below.") }
-        {/if}
-        <Field name={:email}>
-          <EmailInput opts={placeholder: dgettext("auth", "Email"), autofocus: "autofocus"}/>
-          <Label />
-          <ErrorTag />
-        </Field>
-        
-        <Field name={:password}>
-          <PasswordInput opts={placeholder: dgettext("auth", "Password")} />
-          <Label />
-          <ErrorTag />
-        </Field>
-        
-        <div>
-          <Button width="full" size="sm" color="primary">
-          { dgettext "auth", "Register" }
-          </Button>
-        </div>
-      </Form>
+  <Form for={@changeset} action={Routes.user_registration_path(@conn, :create)} class="space-y-6">
+    {#if @changeset.action}
+      { render CircularlyWeb.LayoutView, "_form_notifications.html", message: dgettext("errors", "Oops, something went wrong! Please check the errors below.") }
+    {/if}
+    <Field name={:email}>
+      <EmailInput opts={placeholder: dgettext("auth", "Email"), autofocus: "autofocus"}/>
+      <Label />
+      <ErrorTag />
+    </Field>
+    
+    <Field name={:password}>
+      <PasswordInput opts={placeholder: dgettext("auth", "Password")} />
+      <Label />
+      <ErrorTag />
+    </Field>
+    
+    <div>
+      <Button width="full" size="sm" color="primary">
+      { dgettext "auth", "Register" }
+      </Button>
+    </div>
+  </Form>
 
-      <div class="mt-6">
-        <div class="relative">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300"></div>
-          </div>
-          <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white text-gray-500">
-              { dgettext "auth", "Or register with" }
-            </span>
-          </div>
-        </div>
+  <div class="mt-6">
+    <div class="relative">
+      <div class="absolute inset-0 flex items-center">
+        <div class="w-full border-t border-gray-300"></div>
+      </div>
+      <div class="relative flex justify-center text-sm">
+        <span class="px-2 bg-white text-gray-500">
+          { dgettext "auth", "Or register with" }
+        </span>
+      </div>
+    </div>
 
-        <div class="mt-6 grid grid-cols-3 gap-3">
-          <div>
-            <Button width="full" size="sm" color="white" class="text-gray-500">
-            <span class="sr-only">{ dgettext "auth", "Sign up with Facebook" }</span>
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path fill-rule="evenodd" d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" clip-rule="evenodd" />
-              </svg>
-            </Button>
-          </div>
+    <div class="mt-6 grid grid-cols-3 gap-3">
+      <div>
+        <Button width="full" size="sm" color="white" class="text-gray-500">
+        <span class="sr-only">{ dgettext "auth", "Sign up with Facebook" }</span>
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path fill-rule="evenodd" d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" clip-rule="evenodd" />
+          </svg>
+        </Button>
+      </div>
 
-          <div>
-            <Button width="full"  size="sm" color="white" class="text-gray-500">
-              <span class="sr-only">{ dgettext "auth", "Sign up with Twitter" }</span>
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84" />
-              </svg>
-            </Button>
-          </div>
+      <div>
+        <Button width="full"  size="sm" color="white" class="text-gray-500">
+          <span class="sr-only">{ dgettext "auth", "Sign up with Twitter" }</span>
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84" />
+          </svg>
+        </Button>
+      </div>
 
-          <div>
-            <Button width="full"  size="sm" color="white" class="text-gray-500">
-              <span class="sr-only">{ dgettext "auth", "Sign up with GitHub" }</span>
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd" />
-              </svg>
-            </Button>
-          </div>
-        </div>
+      <div>
+        <Button width="full"  size="sm" color="white" class="text-gray-500">
+          <span class="sr-only">{ dgettext "auth", "Sign up with GitHub" }</span>
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd" />
+          </svg>
+        </Button>
       </div>
     </div>
   </div>
-</div>
+</AuthLayout>
