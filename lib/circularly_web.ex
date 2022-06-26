@@ -41,7 +41,7 @@ defmodule CircularlyWeb do
       unquote(view_helpers())
       import Surface
       alias Surface.Components.{Link, Form}
-      alias Surface.Components.Form.{Field, Label, PasswordInput, EmailInput, ErrorTag}
+      alias Surface.Components.Form.{Field, Label, PasswordInput, EmailInput, ErrorTag, Checkbox}
       alias CircularlyWeb.Components.{Button, AuthLayout}
 
       use Surface.View, root: "lib/circularly_web/templates"
